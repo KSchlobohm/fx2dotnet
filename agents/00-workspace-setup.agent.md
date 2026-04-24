@@ -1,7 +1,7 @@
 ---
 name: "00 Workspace Setup"
 description: "Workshop setup: configures MCP servers and downloads skills for .NET Framework to modern .NET migration. Run this once before assessment work."
-tools: [read, edit, powershell, agent]
+tools: [read, edit, powershell]
 argument-hint: "workspace directory (e.g., C:\\path\\to\\assurance)"
 ---
 
@@ -76,8 +76,20 @@ Download entire skill directories:
 For each skill:
 1. Create the directory if it doesn't exist
 2. Download the SKILL.md file using powershell Invoke-WebRequest
-3. Download all reference files in that skill's references/ subdirectory (if present)
-4. Verify files were created
+3. Check for a `references/` subdirectory by calling the GitHub Contents API with PowerShell:
+   ```powershell
+   $apiBase = "https://api.github.com/repos/KSchlobohm/fx2dotnet/contents/skills"
+   $response = Invoke-WebRequest -Uri "$apiBase/{skill-name}/references" -Headers @{ "User-Agent" = "fx2dotnet-setup" } -ErrorAction SilentlyContinue
+   if ($response.StatusCode -eq 200) {
+       $files = $response.Content | ConvertFrom-Json
+       foreach ($file in $files) {
+           $refDest = "{workspaceRoot}\.github\skills\{skill-name}\references\$($file.name)"
+           New-Item -ItemType Directory -Path (Split-Path $refDest) -Force -ErrorAction SilentlyContinue | Out-Null
+           Invoke-WebRequest -Uri $file.download_url -OutFile $refDest
+       }
+   }
+   ```
+4. Verify all downloaded files were created
 
 Report each download success or failure.
 
