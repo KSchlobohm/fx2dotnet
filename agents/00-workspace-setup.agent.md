@@ -21,21 +21,34 @@ Verify:
 
 ## Phase 2: Set up MCP Configuration
 
-Download the MCP config from fx2dotnet and place it in the VS Code config location (following assurance-fail pattern).
+Download the MCP config from fx2dotnet and produce two tool-specific files:
+
+- `.mcp.json` at workspace root — used by **Copilot CLI**, requires `mcpServers` property
+- `.vscode/mcp.json` — used by **VS Code**, requires `servers` property
 
 **Source:** `https://raw.githubusercontent.com/KSchlobohm/fx2dotnet/refs/heads/kschlobohm/setup-agent/.mcp.json`
-
-**Destination:** `{workspaceRoot}/.vscode/mcp.json`
 
 Using powershell:
 ```powershell
 $url = "https://raw.githubusercontent.com/KSchlobohm/fx2dotnet/refs/heads/kschlobohm/setup-agent/.mcp.json"
-$dest = "{workspaceRoot}\.vscode\mcp.json"
-New-Item -ItemType Directory -Path (Split-Path $dest) -Force -ErrorAction SilentlyContinue | Out-Null
-Invoke-WebRequest -Uri $url -OutFile $dest
+$tempFile = "{workspaceRoot}\.mcp.json"
+New-Item -ItemType Directory -Path (Split-Path $tempFile) -Force -ErrorAction SilentlyContinue | Out-Null
+Invoke-WebRequest -Uri $url -OutFile $tempFile
+
+# Read the downloaded config (source uses mcpServers)
+$json = Get-Content $tempFile -Raw | ConvertFrom-Json
+$serverDefs = if ($json.mcpServers) { $json.mcpServers } else { $json.servers }
+
+# Write Copilot CLI format (.mcp.json at root, mcpServers property)
+[ordered]@{ mcpServers = $serverDefs } | ConvertTo-Json -Depth 10 | Set-Content $tempFile
+
+# Write VS Code format (.vscode/mcp.json, servers property)
+$vscodeDest = "{workspaceRoot}\.vscode\mcp.json"
+New-Item -ItemType Directory -Path (Split-Path $vscodeDest) -Force -ErrorAction SilentlyContinue | Out-Null
+[ordered]@{ servers = $serverDefs } | ConvertTo-Json -Depth 10 | Set-Content $vscodeDest
 ```
 
-Verify the file was created and contains both MCP server configs:
+Verify both files were created and each contains both MCP server configs:
 - `Microsoft.GitHubCopilot.AppModernization.Mcp`
 - `Swick.Mcp.Fx2dotnet`
 
@@ -102,7 +115,8 @@ Workspace Setup Complete
 ========================
 
 Workspace:       {workspaceRoot}
-MCP Config:      .vscode/mcp.json ✅
+MCP Config:      .mcp.json (Copilot CLI) ✅
+                 .vscode/mcp.json (VS Code) ✅
   - Microsoft.GitHubCopilot.AppModernization.Mcp
   - Swick.Mcp.Fx2dotnet
 
