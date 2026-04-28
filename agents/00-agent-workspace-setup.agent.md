@@ -85,6 +85,7 @@ Download entire skill directories:
 3. `owin-identity/SKILL.md` → `{workspaceRoot}/.github/skills/owin-identity/SKILL.md`
 4. `launching-iisexpress/SKILL.md` → `{workspaceRoot}/.github/skills/launching-iisexpress/SKILL.md`
 5. `windows-service-migration/SKILL.md` → `{workspaceRoot}/.github/skills/windows-service-migration/SKILL.md`
+6. `upgrade-artifact-conventions/SKILL.md` → `{workspaceRoot}/.github/skills/upgrade-artifact-conventions/SKILL.md`
 
 For each skill:
 1. Create the directory if it doesn't exist
@@ -130,6 +131,7 @@ Skills Downloaded:
   ✅ owin-identity
   ✅ launching-iisexpress (with references)
   ✅ windows-service-migration
+  ✅ upgrade-artifact-conventions
 
 Status: Ready for assessment
 Next step: Follow workshop instructions to begin assessment workflow
