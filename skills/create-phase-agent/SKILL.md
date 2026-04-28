@@ -79,13 +79,19 @@ At every phase that produces or modifies an artifact, provide explicit evidence:
 
 ### 5. Plan Reference
 
-The agent must read its plan file at the start of execution:
+#### Plan Discovery
 
-```
-Read {stateRoot}/{id}-plan.md before beginning any work.
-```
+Before reading a plan file, the agent must discover which plan applies using this priority order:
 
-The agent executes the plan as written. It does not reinterpret or skip steps.
+1. **Examine pending git commits**: Run `git log --oneline -10` and `git status --short` in the workspace. Look for:
+   - Commit messages that reference a plan file, phase name, or `.fx2dotnet/` state
+   - Staged or modified files under `.fx2dotnet/` that indicate an in-progress phase
+
+   If git reveals an explicit plan file path or a clear phase context, use that file as the plan.
+
+2. **Fall back to convention**: If git does not yield a clear signal, look for `{stateRoot}/{id}-plan.md`, where `{id}` is the numeric prefix of this agent's file name (e.g., `01` for `01-agent-assessment.agent.md` → `{stateRoot}/01-plan.md`).
+
+Once the plan file is identified, read it before beginning any work. The agent executes the plan as written. It does not reinterpret or skip steps.
 
 ## What NOT to Do
 
