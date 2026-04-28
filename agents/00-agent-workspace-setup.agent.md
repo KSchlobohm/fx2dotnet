@@ -68,7 +68,8 @@ Download the following:
 For each agent:
 1. Create the directory if it doesn't exist
 2. Download the file using powershell Invoke-WebRequest
-3. Verify the file was created
+3. Normalize line endings to LF: `(Get-Content $dest -Raw) -replace "\`r\`n", "\`n" | Set-Content $dest -NoNewline`
+4. Verify the file was created
 
 Report each download success or failure.
 
@@ -89,7 +90,11 @@ Download entire skill directories:
 
 For each skill:
 1. Create the directory if it doesn't exist
-2. Download the SKILL.md file using powershell Invoke-WebRequest
+2. Download the SKILL.md file using powershell Invoke-WebRequest, then normalize line endings to LF:
+   ```powershell
+   Invoke-WebRequest -Uri $url -OutFile $dest
+   (Get-Content $dest -Raw) -replace "`r`n", "`n" | Set-Content $dest -NoNewline
+   ```
 3. Check for a `references/` subdirectory by calling the GitHub Contents API with PowerShell:
    ```powershell
    $apiBase = "https://api.github.com/repos/KSchlobohm/fx2dotnet/contents/skills"
@@ -100,6 +105,7 @@ For each skill:
            $refDest = "{workspaceRoot}\.github\skills\{skill-name}\references\$($file.name)"
            New-Item -ItemType Directory -Path (Split-Path $refDest) -Force -ErrorAction SilentlyContinue | Out-Null
            Invoke-WebRequest -Uri $file.download_url -OutFile $refDest
+           (Get-Content $refDest -Raw) -replace "`r`n", "`n" | Set-Content $refDest -NoNewline
        }
    }
    ```
