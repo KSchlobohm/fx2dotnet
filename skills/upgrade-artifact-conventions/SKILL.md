@@ -44,7 +44,8 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 
 | Artifact | Pattern | Example |
 |----------|---------|---------|
-| Agent file | `.github/agents/{id}-agent-{purpose}.md` | `.github/agents/02-agent-assessment.agent.md` |
+| Agent file | `.github/agents/{id}-agent-{purpose}.agent.md` | `.github/agents/02-agent-assessment.agent.md` |
+| Sub-agent file | `.github/agents/subagent-{purpose}.agent.md` | `.github/agents/subagent-build-fix.agent.md` |
 | Plan file | `{stateRoot}/{id}-plan.md` | `.fx2dotnet/02-plan.md` |
 | Progress file | `{stateRoot}/{id}-progress.md` | `.fx2dotnet/02-progress.md` |
 | Retrospective | `{stateRoot}/{id}-retro.md` | `.fx2dotnet/02-retro.md` |

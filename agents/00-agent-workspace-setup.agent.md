@@ -62,8 +62,8 @@ Download helper agents from `kschlobohm/setup-agent` branch into `{workspaceRoot
 
 Download the following:
 
-1. `build-fix.agent.md` → `{workspaceRoot}/.github/agents/build-fix.agent.md`
-2. `project-type-detector.agent.md` → `{workspaceRoot}/.github/agents/project-type-detector.agent.md`
+1. `subagent-build-fix.agent.md` → `{workspaceRoot}/.github/agents/subagent-build-fix.agent.md`
+2. `subagent-project-type-detector.agent.md` → `{workspaceRoot}/.github/agents/subagent-project-type-detector.agent.md`
 
 For each agent:
 1. Create the directory if it doesn't exist
@@ -121,8 +121,8 @@ MCP Config:      .mcp.json (Copilot CLI) ✅
   - Swick.Mcp.Fx2dotnet
 
 Helper Agents Downloaded:
-  ✅ build-fix.agent.md
-  ✅ project-type-detector.agent.md
+  ✅ subagent-build-fix.agent.md
+  ✅ subagent-project-type-detector.agent.md
 
 Skills Downloaded:
   ✅ ef6-migration-policy
