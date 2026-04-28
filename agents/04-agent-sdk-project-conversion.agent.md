@@ -1,5 +1,5 @@
 ---
-name: SDK-Style Project Conversion
+name: "04 SDK Project Conversion"
 description: "Convert a legacy project file to SDK-style format using the convert_project_to_sdk_style tool, then invoke Build Fix to resolve any compilation errors until the project builds successfully."
 argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj file to convert to SDK-style format"
 target: vscode

@@ -1,5 +1,5 @@
 ---
-name: "ASP.NET Framework to ASP.NET Core Web Migration"
+name: "07 ASP.NET Web Migration"
 description: "Plan and execute a web-project-first migration from ASP.NET (.NET Framework) to ASP.NET Core by inventorying endpoints, scaffolding a new ASP.NET Core host, and porting artifacts incrementally. Use when: migrate a System.Web Web API or MVC app to ASP.NET Core, replace a legacy web host with a new ASP.NET Core project, inventory endpoints before migration, move an old web application onto libraries that already work on ASP.NET Core."
 tools: [agent, read, edit, search, todo, vscode/askQuestions]
 user-invocable: false

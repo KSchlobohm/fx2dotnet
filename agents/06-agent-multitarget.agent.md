@@ -1,5 +1,5 @@
 ---
-name: Multitarget Migration
+name: "06 Multitarget Migration"
 description: "Use when multitargeting a .NET project to add multiple target frameworks. Identifies pre-migration API issues, applies minimal fixes with checkpoints, updates TargetFramework to TargetFrameworks, and verifies by invoking Build Fix."
 argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj and target frameworks to add (for example: net10.0)"
 target: vscode

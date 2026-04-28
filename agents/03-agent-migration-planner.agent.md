@@ -1,5 +1,5 @@
 ---
-name: "Migration Planner"
+name: "03 Migration Planner"
 description: "Synthesizes assessment findings into an actionable migration plan. Consumes project classifications, orders package updates into minimal-risk chunks, and produces a phased execution plan for SDK conversion, multitargeting, and ASP.NET Core migration."
 tools: [agent]
 agents: ['Explore']

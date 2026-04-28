@@ -1,5 +1,5 @@
 ---
-name: "Assessment of .NET Solution for Migration"
+name: "01 Assessment"
 description: "Gathers information about a .NET solution for migration to .NET 10. Identifies frameworks, dependencies, routes, and blockers. Classifies each project (SDK-style vs legacy, web host vs library). Resolves NuGet feeds, audits package compatibility, and produces compatibility cards. Returns the assessment report path, topological project order, project classifications, and package compatibility findings."
 tools: [microsoft.githubcopilot.appmodernization.mcp/*, Swick.Mcp.Fx2dotnet/*, read, search, agent, edit, vscode/askQuestions]
 agents: ['Explore', 'Project Type Detector']

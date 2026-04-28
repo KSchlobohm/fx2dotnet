@@ -5,7 +5,7 @@ description: "Orchestrates end-to-end modernization flow: run assessment, create
 argument-hint: "Specify the .sln/.slnx path and optional target framework (default: net10.0)"
 target: vscode
 tools: [vscode/askQuestions, read, agent, edit, search, todo]
-agents: ['Assessment of .NET Solution for Migration', 'Migration Planner', 'SDK-Style Project Conversion', 'Package Compatibility Core Migration', 'Multitarget Migration', 'ASP.NET Framework to ASP.NET Core Web Migration', 'Explore']
+agents: ['01 Assessment', '03 Migration Planner', '04 SDK Project Conversion', '05 Package Compatibility', '06 Multitarget Migration', '07 ASP.NET Web Migration', 'Explore']
 handoffs:
   - label: Commit Changes
     agent: agent
@@ -37,10 +37,10 @@ You are an ORCHESTRATION AGENT for .NET modernization. You enforce stage order a
 
 Each `{ProjectName}.md` file uses sections written by different agents:
 ```markdown
-## SDK Conversion           ← SDK-Style Project Conversion
+## SDK Conversion           ← 04 SDK Project Conversion
 ## Build Fix                ← Build Fix (transient — reset each invocation)
-## Multitarget              ← Multitarget Migration
-## Web Migration            ← ASP.NET Web Migration (web hosts only)
+## Multitarget              ← 06 Multitarget Migration
+## Web Migration            ← 07 ASP.NET Web Migration (web hosts only)
 ```
 
 Project classifications live in `.fx2dotnet/analysis.md` (written by Assessment), NOT in per-project files.
@@ -56,13 +56,13 @@ Project classifications live in `.fx2dotnet/analysis.md` (written by Assessment)
 <rules>
 - Enforce phase order strictly; do not skip or reorder phases
 - Run assessment and planning before any migration work
-- Use the Migration Planner's project classifications to drive all subsequent phases — do not re-classify projects
+- Use the **03 Migration Planner**'s project classifications to drive all subsequent phases — do not re-classify projects
 - Process projects by dependency layer (Layer 1 first, then Layer 2, etc.). Projects within the same layer are independent and can be processed in any order. Complete all projects in a layer before advancing to the next.
 - Do not run SDK-style conversion for projects the plan classifies as web hosts or already SDK-style
-- For each project the plan marks as needs-sdk-conversion, invoke SDK-Style Project Conversion agent
-- After SDK-style normalization is complete, invoke Package Compatibility Core Migration with the assessment's package compatibility plan
-- After package compatibility migration completes, invoke Multitarget Migration layer by layer
-- After multitarget migration completes, invoke ASP.NET Framework to ASP.NET Core Web Migration using the plan's web host candidate
+- For each project the plan marks as needs-sdk-conversion, invoke **04 SDK Project Conversion** agent
+- After SDK-style normalization is complete, invoke **05 Package Compatibility** with the assessment's package compatibility plan
+- After package compatibility migration completes, invoke **06 Multitarget Migration** layer by layer
+- After multitarget migration completes, invoke **07 ASP.NET Web Migration** using the plan's web host candidate
 - Linux and cross-platform support is a separate concern — the goal of this migration is to get from .NET Framework to modern .NET on Windows. Do not remove `-windows` TFM suffixes, add platform-conditional code, or introduce Linux hosting packages (e.g., `Microsoft.Extensions.Hosting.Systemd`) during this migration. Cross-platform adaptation is a post-migration activity.
 - Stop and ask the user when a required input is missing, a classification is uncertain, or a decision cannot be derived safely
 </rules>
@@ -106,7 +106,7 @@ Do not duplicate data that lives in other `.fx2dotnet/` files (assessment report
 
 ## 2. Run Assessment
 
-Invoke the **Assessment of .NET Solution for Migration** subagent with the solutionPath.
+Invoke the **01 Assessment** subagent with the solutionPath.
 The subagent writes its outputs to:
 - `.fx2dotnet/analysis.md` — the full assessment report (includes project classifications)
 - `.fx2dotnet/package-updates.md` — package compatibility findings (feeds, compatibility cards, unsupported libs, out-of-scope items)
@@ -121,7 +121,7 @@ Update `lastCompletedPhase: "assessment"` in `.fx2dotnet/plan.md` via the `edit`
 
 ## 3. Create Migration Plan
 
-Invoke the **Migration Planner** subagent with:
+Invoke the **03 Migration Planner** subagent with:
 - assessmentContent (the full text of the assessment report — read from `.fx2dotnet/analysis.md` and pass inline)
 - topologicalProjects
 - dependencyLayers (from the assessment's Dependency Layers section in `.fx2dotnet/analysis.md`)
@@ -145,7 +145,7 @@ Using the plan's Phase 1 list organized by dependency layer, process projects la
 
 For each layer:
 - For each project in the layer marked `needs-sdk-conversion`:
-  - Invoke SDK-Style Project Conversion agent with that project path (and solution context if needed)
+  - Invoke **04 SDK Project Conversion** agent with that project path (and solution context if needed)
   - Projects within the same layer are independent — process them in any order
 - Wait for ALL projects in the current layer to complete before moving to the next layer
 - If conversion fails for a project, stop and ask user how to proceed
@@ -159,10 +159,10 @@ Update `lastCompletedPhase: "sdk-normalization"` in `.fx2dotnet/plan.md` via the
 
 If the packageCompatFindings (from `.fx2dotnet/package-updates.md`) contains low-confidence items, present them to the user and wait for approval before proceeding.
 
-Invoke **Package Compatibility Core Migration** agent with:
+Invoke **05 Package Compatibility** agent with:
 - solutionPath
 - targetFramework
-- Chunked update plan from the Migration Planner's output (chunked update queue and compatibility cards — read from `.fx2dotnet/package-updates.md`)
+- Chunked update plan from the **03 Migration Planner**'s output (chunked update queue and compatibility cards — read from `.fx2dotnet/package-updates.md`)
 
 The subagent reads and updates its execution state in `.fx2dotnet/package-updates.md`.
 
@@ -177,7 +177,7 @@ Using the plan's Phase 3 list organized by dependency layer, process projects la
 
 For each layer:
 - For each project in the layer:
-  - Invoke Multitarget Migration agent with:
+  - Invoke **06 Multitarget Migration** agent with:
     - project path
     - targetFramework(s) requested by user (if unspecified, pass net10.0)
   - Projects within the same layer are independent — process them in any order
@@ -187,13 +187,13 @@ For each layer:
 
 Update `multitargetStatus` and `lastCompletedPhase: "multitarget"` in `.fx2dotnet/plan.md` via the `edit` tool.
 
-## 7. Run ASP.NET Framework to ASP.NET Core Web Migration
+## 7. Run ASP.NET Web Migration
 
 Using the plan's Phase 4 web host candidate(s):
 - If the plan identified a single confirmed web host, use it
 - If multiple candidates or user confirmation needed, ask the user to choose
 
-Invoke ASP.NET Framework to ASP.NET Core Web Migration with:
+Invoke **07 ASP.NET Web Migration** with:
 - the resolved web host project path
 - solutionPath
 - targetFramework (default net10.0 unless user specified)
