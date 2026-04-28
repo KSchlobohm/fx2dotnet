@@ -111,19 +111,6 @@ Parse the `.sln` file to build a complete project list. For each project, note:
 ### Existing Governance
 - `.github/copilot-instructions.md` — existing repo-level instructions (if any)
 
-### Naming and Placement Design
-- Review whatever naming evidence already exists at constitution time: the current repo layout,
-  any existing agent files, the assessment outputs, and any user-stated workflow preferences
-- Do **not** assume later execution artifacts already exist. At this point in the sequence,
-  many files such as chunk-specific plans, progress files, and retrospectives may not have been
-  created yet
-- If naming drift or ambiguity is already visible - or the user expresses a preference for
-  shorthand references - include a **forward-looking** terminology and artifact placement section
-  in the constitution
-- Design the convention so future artifacts can be created predictably even when the current
-  inventory is incomplete
-- Do **not** require retroactive renames unless the user explicitly asks
-
 ### Skills (Domain Policies and Build)
 - `.github/skills/owin-identity/SKILL.md` — OWIN bridge policy (if it exists)
 - `.github/skills/systemweb-adapters/SKILL.md` — System.Web adapter policy (if it exists)
@@ -309,22 +296,8 @@ Open the constitution with a clear scope statement:
 ### Structural Sections (always include)
 - **Precedence** — constitution > amendments > migration plan > agent instructions > skills
   (note: the plan is now governed by the constitution, not the other way around)
-- **Standard Terminology and Artifact Placement** — a forward-looking section that defines
-  canonical terms, canonical folders, and a short-ID naming convention for future work.
-  This section should:
-  - standardize the meanings of **upgrade target**, **phase**, **chunk**, **layer**, and
-    **state file**
-  - prefer a short, human-typeable ID format like `{phase}{optional-letter}` (examples:
-    `00`, `02b`, `05c`)
-  - define predictable shorthand-compatible artifact names such as:
-    - `.github/agents/{id}-agent-{purpose}.md`
-    - `{stateRoot}/{id}-plan.md`
-    - `{stateRoot}/{id}-progress.md`
-    - `{stateRoot}/{id}-retro.md`
-  - be written as a **future-state convention**, not as a claim that those artifacts already
-    exist at constitution time
-  - explicitly state that this rule is for **future** work and does not require renaming
-    legacy files
+- **Standard Terminology** — a forward-looking section that standardizes the meanings of
+  **upgrade target**, **phase**, **chunk**, **layer**, and **state file**
 - **Enforcement** — validation checks that reference principles by number
   plus stop-and-escalate procedure; includes plan validation
 - **Governance** — amendment process requiring explicit user approval + amendment log
@@ -404,9 +377,7 @@ created after this point will read `copilot-instructions.md` and discover the co
 
 ### Meta-Plan Template
 If an agent/plan template file exists (e.g., `.incremental-upgrade-process/00-meta-plan-template.md`),
-add a note reminding template consumers to include a constitution reference in generated agents
-and to follow the same short-ID artifact pattern (`05c-agent`, `05c-plan`, `05c-progress`,
-`05c-retro`) for future consistency.
+add a note reminding template consumers to include a constitution reference in generated agents.
 
 Record enforcement completion in `{stateRoot}/constitution-progress.md` under Phase 6.
 

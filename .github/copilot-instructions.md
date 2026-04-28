@@ -32,6 +32,8 @@ Pinned SDK: .NET 10 preview (see `global.json`). Output goes to `artifacts/` via
 - All terminal commands (`dotnet build`, `dotnet restore`, etc.) must run via **subagent**, never directly in the terminal
 - State persisted in `.fx2dotnet/{ProjectName}.md` markdown files relative to the solution being migrated
 
+> **Important**: The `agents/` and `skills/` folders in this repo are **plugin source templates** — they are deployed into a user's workspace during a migration, not used directly here. The artifact-conventions skill (`skills/upgrade-artifact-conventions/SKILL.md`) defines naming rules for files created *inside the user's workspace* (e.g., `.github/agents/`, `.fx2dotnet/`). Do **not** apply those naming conventions to files in this repo.
+
 ### Skills (`skills/*/SKILL.md`)
 
 - Encode migration policies that constrain agent behavior (e.g., "retain EF6, don't swap to EF Core")
