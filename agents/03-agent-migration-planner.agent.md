@@ -52,6 +52,12 @@ Before parsing the assessment, check whether an upgrade constitution exists:
 
 This step enforces constitution constraints before any planning decisions are made, preventing the planner from undoing the constitution's protections.
 
+### 0.5. Read OWIN-Identity Skill (if present)
+
+1. Attempt to read `.github/skills/owin-identity/SKILL.md` (path relative to the solution directory)
+2. If the file does **not** exist, skip this step and continue to step 1
+3. If the file exists, read and retain its guidance — apply it in Step 4 when resolving any package under `Microsoft.AspNet.Identity.*`, `Microsoft.Owin.*`, or related OWIN namespaces. The skill's guidance takes precedence over the default resolution options for those packages.
+
 ### 1. Parse Assessment Data
 
 From the provided `assessmentContent`, extract:
@@ -93,6 +99,8 @@ This step establishes **every change** that is required because a package or lib
 
 For every unsupported library and out-of-scope item identified in the assessment, you MUST recommend a concrete resolution. Do NOT leave these as passive lists — each item needs a decision.
 
+**Before resolving any OWIN or ASP.NET Identity package:** read `.github/skills/owin-identity/SKILL.md` if it exists (see step 0.5). If the skill is present, its guidance takes precedence over the default resolution options for those packages. The correct approach is the `Microsoft.AspNetCore.SystemWebAdapters.Owin` compatibility bridge — not Replace, not Wrap & isolate.
+
 **For each unsupported library** (no compatible version exists for the target framework):
 1. Use the **Explore** subagent to search the codebase for how the package is used (which projects, which APIs, how deeply integrated)
 2. Recommend exactly one resolution per package:
@@ -101,6 +109,10 @@ For every unsupported library and out-of-scope item identified in the assessment
    - **Wrap & isolate** — the package is deeply integrated. Recommend isolating it behind an interface/abstraction so it can be swapped later, and keep it via a compatibility shim or `#if` conditional compilation during multitargeting.
    - **Drop** — the functionality provided by the package is no longer needed. Justify why.
    - **Block** — no viable path forward without user input. Clearly state what decision is needed from the user.
+   - **Keep via compatibility bridge** — a shim or adapter package exists that hosts the existing dependency inside the new runtime without source changes. Use when the `owin-identity` skill or another bridge skill applies. Name the bridge package and confirm it is installed in the chunked package update plan.
+
+> **Do not use "Wrap & isolate" for packages where a compatibility bridge exists.** Gating a type that is used by shared base classes will propagate compile errors to every derived class — a cascade that is invisible until the affected layer is compiled against the new target. Check for a bridge option before scheduling any `#if NET48` gating.
+
 3. Estimate the impact: how many files/call sites are affected
 
 **For each out-of-scope item** (e.g., EF6, proprietary SDKs, platform-specific libraries):
@@ -112,7 +124,7 @@ For every unsupported library and out-of-scope item identified in the assessment
 
 The ONLY goal of package updates is to reach versions that support .NET Core / .NET Standard / modern .NET. Do NOT include updates motivated purely by security advisories, bug fixes, or staying on the latest version — those are out of scope for the migration and can be addressed separately afterward. If a package already supports the target, it MUST NOT be updated.
 
-This step covers only packages that have a compatible version available. Packages resolved as unsupported in step 4 (replace, remove-rewrite, wrap-isolate, drop, or block) are NOT included here — their resolutions are already established.
+This step covers only packages that have a compatible version available. Packages resolved as unsupported in step 4 (replace, remove-rewrite, wrap-isolate, keep-bridge, drop, or block) are NOT included here — their resolutions are already established.
 
 Using the compatibility cards from the assessment, build an ordered update plan:
 
@@ -176,10 +188,11 @@ Every unsupported package MUST have a resolution. Do not leave any as "TBD" or u
 All changes due to out-of-support packages are established here — no additional package changes beyond these resolutions and the chunked update plan below.
 | Package | Current | Projects | Usage Scope | Resolution | Detail |
 
-Resolution values: `replace`, `remove-rewrite`, `wrap-isolate`, `drop`, `block`
+Resolution values: `replace`, `remove-rewrite`, `wrap-isolate`, `keep-bridge`, `drop`, `block`
 - **replace**: Name the alternative package and version
 - **remove-rewrite**: Describe what needs reimplementing and estimated scope
 - **wrap-isolate**: Describe the abstraction boundary to introduce
+- **keep-bridge**: Name the bridge package and confirm it is installed in the chunked package update plan
 - **drop**: Justify why the functionality is no longer needed
 - **block**: State exactly what user decision is required — this blocks the migration
 
