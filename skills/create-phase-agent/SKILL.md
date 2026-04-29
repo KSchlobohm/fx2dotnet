@@ -93,6 +93,16 @@ Before reading a plan file, the agent must discover which plan applies using thi
 
 Once the plan file is identified, read it before beginning any work. The agent executes the plan as written. It does not reinterpret or skip steps.
 
+## Subagents
+
+Phase agents that involve building, compiling, or verifying build health must declare the `subagent-build-fix` agent in their frontmatter and delegate all build/fix loops to it:
+
+```yaml
+agents: ['subagent-build-fix']
+```
+
+Do not implement a build/fix loop inline inside a phase agent — delegate to `subagent-build-fix` instead.
+
 ## What NOT to Do
 
 - Do not hardcode file paths in the agent — derive them from `{stateRoot}` and `{id}`
