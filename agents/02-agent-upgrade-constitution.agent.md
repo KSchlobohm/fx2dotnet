@@ -293,6 +293,18 @@ Open the constitution with a clear scope statement:
   bridges the OWIN auth pipeline. This solves authentication bridging, not System.Web types.
 - **Correctly Gated Dependencies** — contrast list of what IS properly gated (prevents
   over-application of the protected dependencies rule)
+- **Deferred Work Standards** — the plan file is the only authoritative record of deferred
+  work. Source code artifacts (`// TODO` comments, `#if` preprocessor gates, commented-out
+  blocks) are invisible to agents executing future phases and must not be used as deferred-work
+  records. Two categories apply:
+  - **User-deferred work** (post-migration, user owns): captured in the "Framework Migration ≠
+    Modernization" deferred modernization table. That table entry IS the record. Nothing in
+    source code substitutes for it.
+  - **Agent-deferred work** (within the migration sequence): when an agent defers a task to a
+    later phase, it must write a plan file entry before committing. The entry must name:
+    (1) the capability being deferred, (2) the package or code path involved, (3) the specific
+    phase or step in the migration sequence that will address it.
+  The rule: if it is not in a plan file, it does not exist.
 - **Planner Constraints** — machine-readable constraint block for the downstream planner;
   see format requirement below
 
