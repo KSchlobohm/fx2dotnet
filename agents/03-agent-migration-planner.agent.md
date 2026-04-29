@@ -38,6 +38,20 @@ The assessment content contains:
 
 ## Workflow
 
+### 0. Read Constitution Constraints (if present)
+
+Before parsing the assessment, check whether an upgrade constitution exists:
+
+1. Attempt to read `.github/fx2dotnet/CONSTITUTION.md` (path relative to the solution directory)
+2. If the file does **not** exist, skip this step and continue to step 1 — the constitution phase has not run yet
+3. If the file exists, locate the `## Planner Constraints` section
+4. Parse the table under that heading into a **protected package exclusion list**
+5. For the remainder of this workflow, any package on the exclusion list MUST NOT appear as a target in any work item — no update, removal, or replacement
+6. If a work item would otherwise target a protected package, drop it and record the omission in the plan's summary section under a `### Constitution Exclusions` heading, e.g.:
+   > `EntityFramework` — excluded per constitution (PROTECTED: native on .NET 10)
+
+This step enforces constitution constraints before any planning decisions are made, preventing the planner from undoing the constitution's protections.
+
 ### 1. Parse Assessment Data
 
 From the provided `assessmentContent`, extract:
@@ -128,6 +142,11 @@ Generate a structured plan with these sections:
 - Projects needing SDK conversion: {count} (includes web-library projects)
 - Web-app-host projects (excluded from SDK conversion): {count}
 - Assessment: provided inline
+
+### Constitution Exclusions
+(Omit this section if no constitution exists or no packages were excluded.)
+Packages excluded from planning per `.github/fx2dotnet/CONSTITUTION.md`:
+- `{packageId}` — excluded per constitution ({Disposition}: {Reason})
 
 ## Project Classifications
 | # | Project | SDK-Style | Classification | Action |

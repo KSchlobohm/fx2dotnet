@@ -291,20 +291,45 @@ Open the constitution with a clear scope statement:
 - **Host Bridge Strategy** — consequence of keeping OWIN/Identity (if applicable). The
   `Microsoft.AspNetCore.SystemWebAdapters.Owin` package goes in the host project only and
   bridges the OWIN auth pipeline. This solves authentication bridging, not System.Web types.
-- **Correctly Gated Dependencies** — contrast list (exceptions to Principle 1)
+- **Correctly Gated Dependencies** — contrast list of what IS properly gated (prevents
+  over-application of the protected dependencies rule)
+- **Planner Constraints** — machine-readable constraint block for the downstream planner;
+  see format requirement below
+
+### Planner Constraints Section (mandatory)
+
+The constitution MUST include a section with the exact heading `## Planner Constraints`.
+This section is a binding constraint block consumed by the migration planner. Its fixed
+heading allows the planner to locate it via a simple section parse without understanding
+the full constitution structure.
+
+Format:
+
+```markdown
+## Planner Constraints
+
+The following packages are protected. The planning agent MUST NOT create any work item
+that modifies, replaces, or removes these packages.
+
+| Package | Disposition | Reason |
+|---------|-------------|--------|
+| {packageId} | {PROTECTED or PROTECTED+NU1701} | {one-sentence rationale} |
+```
+
+Population rules:
+- Include every package classified as **PROTECTED** or **PROTECTED+NU1701** in Phase 2.
+- The `Reason` column must state *why replacement is ruled out* (e.g., "native on .NET 10 —
+  netstandard2.0 target; no replacement needed"), not just the classification label.
+- Do NOT include CORRECTLY GATED packages here — those are gated, not protected.
+- Wildcards are allowed for package families (e.g., `Microsoft.AspNet.Identity.*`).
 
 ### Structural Sections (always include)
 - **Precedence** — constitution > amendments > migration plan > agent instructions > skills
   (note: the plan is now governed by the constitution, not the other way around)
 - **Standard Terminology** — a forward-looking section that standardizes the meanings of
   **upgrade target**, **phase**, **chunk**, **layer**, and **state file**
-- **Enforcement** — validation checks that reference principles by number
+- **Enforcement** — validation checks that reference principles by number (not restate them),
   plus stop-and-escalate procedure; includes plan validation
-- **Governance** — amendment process requiring explicit user approval + amendment log
-- **Correctly Gated Dependencies** — contrast list of what IS properly gated (prevents
-  over-application of the protected dependencies rule)
-- **Enforcement** — validation checks that reference rules by number (not restate them),
-  plus stop-and-escalate procedure
 - **Governance** — amendment process requiring explicit user approval + amendment log
 
 Record draft completion in `{stateRoot}/constitution-progress.md` under Phase 3.
