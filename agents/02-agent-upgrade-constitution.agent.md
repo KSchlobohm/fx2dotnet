@@ -132,6 +132,13 @@ Run a full solution build and record which projects compile successfully and whi
 This becomes the **build census baseline** — a snapshot of the health of every project in the
 solution before any migration work begins. Use this to detect regressions later (see Phase 3).
 
+**Build tool requirement:** Use `msbuild <solution>.sln /t:Build /p:Configuration=Debug`
+for the full-solution build. Do NOT use `dotnet build -f net48` as a substitute — it
+evaluates projects in isolation and may not surface inter-project dependency issues or SDK
+resolution errors that only appear in a full solution build. If `msbuild` is not available
+in the current environment, stop and report this as a **blocking prerequisite** before
+continuing to Phase 2.
+
 ### Package Metadata
 For each package that the assessment marks as "not supported" or "incompatible" on modern .NET,
 determine its actual target framework(s). Use `powershell` to inspect NuGet package metadata
@@ -293,6 +300,9 @@ Open the constitution with a clear scope statement:
 
 ### Principle: Build Census and Validation
 - Build tool requirements, build census, integration tests, coverage gap policy
+- The constitution must state: all build validation during this upgrade must use
+  `msbuild <solution>.sln` for full-solution builds. Per-project `dotnet build` is permitted
+  only for targeted diagnostic checks, not as evidence of solution-wide build health.
 
 ### Application Sections (flow from the principles)
 - **Protected Dependency Matrix** — consequence of Principle 1; table with evidence
