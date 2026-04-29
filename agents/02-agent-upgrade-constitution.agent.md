@@ -189,6 +189,24 @@ This is the canonical case the constitution exists to protect:
 An assessment that marks `Microsoft.Owin` as "not supported" is **wrong** — the NuGet metadata
 proves it targets netstandard2.0. The constitution corrects this.
 
+#### Prime Example 2: Entity Framework 6.3
+
+`EntityFramework` 6.3+ ships **both** `net40` and `netstandard2.1` TFMs:
+- On .NET Framework 4.x: resolves `net40` — unchanged behavior
+- On .NET 10: resolves `netstandard2.1` → native, no compat shim, no NU1701 warning
+
+Common AI misclassification: "EntityFramework does not support .NET 10 — upgrade to Entity
+Framework Core."
+
+Why this is wrong: EF 6.x and EF Core are **not API-compatible**. EF Core uses a different
+query model (no ObjectContext, different LINQ translation), a different migration system, and
+different schema conventions (e.g., plural vs singular table names, key naming). Replacing
+EF 6.3 with EF Core is a data migration project, not a package upgrade.
+
+Correct classification: **PROTECTED**
+Reasoning: Ships `netstandard2.1` (native on .NET 10) and `net40` (native on .NET Framework).
+No replacement is needed or in scope for this upgrade.
+
 #### Deferred Modernization Candidates
 
 Identify dependencies where a modern replacement exists but migration is unnecessary risk:
