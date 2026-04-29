@@ -15,7 +15,7 @@ migration; they do **NOT** restrict unrelated code changes elsewhere in the repo
 You run **after assessment** (which produces `analysis.md` and `package-updates.md`) and
 **before the migration planner** — so the planner creates a plan that respects your principles.
 
-Your output is `.github/fx2dotnet/CONSTITUTION.md` — the supreme governance artifact for the
+Your output is `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` — the supreme governance artifact for the
 upgrade task. The planner AND all downstream execution agents working on the migration must
 obey it. You also wire enforcement via `.github/copilot-instructions.md`.
 
@@ -28,7 +28,7 @@ The planner has not yet run when you execute. You work from the **assessment out
 
 - solutionDir: parent directory of the resolved solution file path
 - stateRoot: `{solutionDir}/.fx2dotnet/`
-- constitutionPath: `.github/fx2dotnet/CONSTITUTION.md`
+- constitutionPath: `.github/fx2dotnet/UPGRADE-CONSTITUTION.md`
 - copilotInstructionsPath: `.github/copilot-instructions.md`
 
 </fixed-inputs>
@@ -266,7 +266,7 @@ Record the classification in `{stateRoot}/constitution-progress.md` under Phase 
 
 ## Phase 3: Draft Constitution
 
-Create `.github/fx2dotnet/CONSTITUTION.md`. The constitution is **principle-driven** — lead
+Create `.github/fx2dotnet/UPGRADE-CONSTITUTION.md`. The constitution is **principle-driven** — lead
 with the "why" and let specific package/scope decisions flow as consequences.
 
 Open the constitution with a clear scope statement:
@@ -424,7 +424,7 @@ Create or amend `.github/copilot-instructions.md` to include:
 ## fx2dotnet Upgrade Constitution
 
 When working on the .NET migration upgrade task for `{solutionPath}`, read and obey
-**`.github/fx2dotnet/CONSTITUTION.md`** before making any decisions about package
+**`.github/fx2dotnet/UPGRADE-CONSTITUTION.md`** before making any decisions about package
 compatibility, dependency resolution, project scope, or conditional compilation.
 The constitution establishes principles that govern the upgrade task — the migration
 planner AND all execution agents working on the migration. It takes precedence over

@@ -24,7 +24,7 @@ Add the following as an explicit rule in the constitution agent's Phase 3 "Forbi
 > The plan file must name: (1) the capability being deferred, (2) the package or code path involved, (3) the condition under which it will be addressed.  
 > Source comments are not visible to agents executing future phases. If it is not in a plan file, it does not exist.
 
-This rule should also be written into the output `CONSTITUTION.md` file so all execution agents that read it inherit the constraint.
+This rule should also be written into the output `UPGRADE-CONSTITUTION.md` file so all execution agents that read it inherit the constraint.
 
 ## Why This Matters
 

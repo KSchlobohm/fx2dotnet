@@ -4,7 +4,7 @@
 
 The constitution agent (`02-agent-upgrade-constitution.agent.md`) produces a Protected Dependency Matrix in Phase 3, but it is formatted as informational prose. There is no instruction to the agent to format the matrix as a structured, machine-readable constraint block that a downstream planner agent can treat as a hard exclusion list.
 
-Without this, the planner may read `CONSTITUTION.md` and still schedule work items against protected packages — because nothing tells it those entries are binding constraints, not just observations.
+Without this, the planner may read `UPGRADE-CONSTITUTION.md` and still schedule work items against protected packages — because nothing tells it those entries are binding constraints, not just observations.
 
 ## Context
 
@@ -13,7 +13,7 @@ Without this, the planner may read `CONSTITUTION.md` and still schedule work ite
 
 - **Where the matrix is produced:** Phase 3 (Draft) of the constitution agent — the agent classifies each dependency and assigns a disposition (PROTECTED, PROTECTED+NU1701, CORRECTLY GATED, etc.)
 
-- **Where the matrix needs to be consumed:** The planning agent (Phase 03 of the workshop guide) — it should read `CONSTITUTION.md` and skip any work item that touches a protected package.
+- **Where the matrix needs to be consumed:** The planning agent (Phase 03 of the workshop guide) — it should read `UPGRADE-CONSTITUTION.md` and skip any work item that touches a protected package.
 
 - **Current gap:** The constitution agent does not instruct the output file to include a dedicated planner-facing section. The planner agent does not (yet) have an instruction to read the constitution before creating work items.
 
@@ -21,7 +21,7 @@ Without this, the planner may read `CONSTITUTION.md` and still schedule work ite
 
 ### Change 1: Constitution agent — Phase 3 output format
 
-In the Phase 3 (Draft) instructions, add a requirement that `CONSTITUTION.md` must include a dedicated section with a fixed heading, e.g.:
+In the Phase 3 (Draft) instructions, add a requirement that `UPGRADE-CONSTITUTION.md` must include a dedicated section with a fixed heading, e.g.:
 
 ```markdown
 ## Planner Constraints
@@ -41,7 +41,7 @@ The fixed heading `## Planner Constraints` allows the planner to locate it relia
 
 In the planner agent file (whichever file drives Phase 03), add an early instruction:
 
-> Before creating any work items, read `.github/fx2dotnet/CONSTITUTION.md`.  
+> Before creating any work items, read `.github/fx2dotnet/UPGRADE-CONSTITUTION.md`.  
 > Locate the `## Planner Constraints` section.  
 > Do not create any work item — upgrade, removal, or replacement — for any package listed in that table.  
 > If a work item would otherwise target a protected package, drop it silently and note the omission in the plan summary.

@@ -42,7 +42,7 @@ The assessment content contains:
 
 Before parsing the assessment, check whether an upgrade constitution exists:
 
-1. Attempt to read `.github/fx2dotnet/CONSTITUTION.md` (path relative to the solution directory)
+1. Attempt to read `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` (path relative to the solution directory)
 2. If the file does **not** exist, skip this step and continue to step 1 — the constitution phase has not run yet
 3. If the file exists, locate the `## Planner Constraints` section
 4. Parse the table under that heading into a **protected package exclusion list**
@@ -157,7 +157,7 @@ Generate a structured plan with these sections:
 
 ### Constitution Exclusions
 (Omit this section if no constitution exists or no packages were excluded.)
-Packages excluded from planning per `.github/fx2dotnet/CONSTITUTION.md`:
+Packages excluded from planning per `.github/fx2dotnet/UPGRADE-CONSTITUTION.md`:
 - `{packageId}` — excluded per constitution ({Disposition}: {Reason})
 
 ## Project Classifications

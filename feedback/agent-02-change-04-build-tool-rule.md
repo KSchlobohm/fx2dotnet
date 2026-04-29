@@ -26,7 +26,7 @@ In Phase 1 (Evidence), update the build census instructions to specify:
 > Do not use `dotnet build -f net48` as a substitute — it evaluates projects in isolation and may not surface inter-project or SDK resolution errors.  
 > If `msbuild` is not available in the current environment, stop and report this as a blocking prerequisite.
 
-Additionally, add this as a principle in the output `CONSTITUTION.md` so execution agents inherit it:
+Additionally, add this as a principle in the output `UPGRADE-CONSTITUTION.md` so execution agents inherit it:
 
 > All build validation during this upgrade must use `msbuild <solution>.sln` for full-solution builds.  
 > Per-project `dotnet build` is permitted only for targeted diagnostic checks, not as evidence of solution-wide build health.
