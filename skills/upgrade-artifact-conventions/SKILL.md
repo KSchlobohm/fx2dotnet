@@ -44,22 +44,22 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 
 | Artifact | Pattern | Example |
 |----------|---------|---------|
-| Agent file | `.github/agents/{id}-agent-{purpose}.agent.md` | `.github/agents/02-agent-assessment.agent.md` |
+| Agent file | `.github/agents/{id}-agent-{purpose}.agent.md` | `.github/agents/01-agent-assessment.agent.md` |
 | Sub-agent file | `.github/agents/subagent-{purpose}.agent.md` | `.github/agents/subagent-build-fix.agent.md` |
 | Plan file | `{stateRoot}/{id}-plan.md` | `.fx2dotnet/02-plan.md` |
 | Progress file | `{stateRoot}/{id}-progress.md` | `.fx2dotnet/02-progress.md` |
 | Retrospective | `{stateRoot}/{id}-retro.md` | `.fx2dotnet/02-retro.md` |
 | Assessment report | `{stateRoot}/analysis.md` | `.fx2dotnet/analysis.md` |
 | Package findings | `{stateRoot}/package-updates.md` | `.fx2dotnet/package-updates.md` |
-| Constitution | `.github/fx2dotnet/CONSTITUTION.md` | (fixed path) |
+| Constitution | `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` | (fixed path) |
 
 ## Agent Invocation
 
 The Copilot CLI `--agent` flag strips the `.agent.md` suffix and resolves from `.github/agents/`:
 
 ```
---agent 02-agent-assessment
-→ .github/agents/02-agent-assessment.agent.md
+--agent 01-agent-assessment
+→ .github/agents/01-agent-assessment.agent.md
 ```
 
 ## Rules
