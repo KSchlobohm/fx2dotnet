@@ -162,7 +162,7 @@ For each slice:
 
 - Port the minimum required code.
 - Keep route and contract parity.
-- Prefer ASP.NET Core primitives instead of compatibility shims when behavior stays equivalent.
+- For `System.Web` types (`HttpContext`, `HttpRequest`, `HttpResponse`, `IHttpModule`, `IHttpHandler`), follow the `systemweb-adapters` skill — adapters are the **default** approach during migration. Native ASP.NET Core type rewrites are post-migration. For non-System.Web framework wiring (routing, DI, middleware pipeline, configuration), prefer native ASP.NET Core patterns directly.
 - Reuse existing library code instead of re-implementing it in the host.
 - Document deliberate behavior changes in the `## Web Migration` section of `.fx2dotnet/{ProjectName}.md`.
 - **After completing each slice, immediately delegate to the `Build Fix` agent** targeting the new ASP.NET Core host project. Pass the `.csproj` path of the new host project as the argument. Do not proceed to the next slice until the build is clean.

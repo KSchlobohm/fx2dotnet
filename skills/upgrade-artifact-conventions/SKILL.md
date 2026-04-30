@@ -51,6 +51,7 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 | Retrospective | `{stateRoot}/{id}-retrospective.md` | `.fx2dotnet/02-retrospective.md` |
 | Assessment report | `{stateRoot}/analysis.md` | `.fx2dotnet/analysis.md` |
 | Package findings | `{stateRoot}/package-updates.md` | `.fx2dotnet/package-updates.md` |
+| Orchestrator state | `{stateRoot}/plan.md` | `.fx2dotnet/plan.md` |
 | Constitution | `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` | (fixed path) |
 
 ## Agent Invocation
@@ -64,10 +65,10 @@ The Copilot CLI `--agent` flag strips the `.agent.md` suffix and resolves from `
 
 ## Rules
 
-1. **Always use the short-ID prefix** — Every agent, plan, progress, and retrospective file must be prefixed with its phase ID.
+1. **Always use the short-ID prefix** — Every phase agent, plan, progress, and retrospective file must be prefixed with its phase ID. Subagents (named `subagent-{purpose}.agent.md`) are shared across phases and are exempt from the phase ID prefix.
 2. **State files go in `{stateRoot}`** — No state files at the workspace root or in `.github/`.
 3. **Agent files go in `.github/agents/`** — No agent files outside this folder.
-4. **Do not use freeform names** — Names like `plan.md`, `assessment-agent.md`, or `progress.txt` are non-compliant. Use the patterns above.
+4. **Do not use freeform names** — Names like `assessment-agent.md` or `progress.txt` are non-compliant. Use the patterns above.
 5. **Do not retroactively rename** — Apply conventions to new artifacts only, unless the user explicitly requests a rename.
 
 ## What NOT to Do

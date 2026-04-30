@@ -39,7 +39,11 @@ Every phase agent must include these sections:
 
 ### 1. Resume Check
 
-Before starting any work, check whether a progress file exists at `{stateRoot}/{id}-progress.md`:
+Before starting any work, locate the relevant state and resume from the last incomplete step.
+
+**For phases that process multiple projects** (e.g., SDK conversion, multitarget, web migration): state is tracked in per-project sections inside `{stateRoot}/{ProjectName}.md`. Check whether the relevant section (e.g., `## SDK Conversion`) already exists and is marked complete before processing each project.
+
+**For phases that produce a single artifact** (e.g., assessment, constitution): check whether a progress file exists at `{stateRoot}/{id}-progress.md`:
 - If it exists, read it and resume from the last incomplete phase
 - If it does not exist, create it and start from Phase 1
 
@@ -95,13 +99,13 @@ Once the plan file is identified, read it before beginning any work. The agent e
 
 ## Subagents
 
-Phase agents that involve building, compiling, or verifying build health must declare the `subagent-build-fix` agent in their frontmatter and delegate all build/fix loops to it:
+Phase agents that involve building, compiling, or verifying build health must declare the `Build Fix` agent in their frontmatter and delegate all build/fix loops to it:
 
 ```yaml
-agents: ['subagent-build-fix']
+agents: ['Build Fix']
 ```
 
-Do not implement a build/fix loop inline inside a phase agent — delegate to `subagent-build-fix` instead.
+Do not implement a build/fix loop inline inside a phase agent — delegate to `Build Fix` instead.
 
 ## What NOT to Do
 
