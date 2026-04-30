@@ -31,7 +31,17 @@ tools: [<tools required by the plan>]
 ---
 ```
 
-Declare **only the tools the plan actually needs**. Review the plan before populating the `tools` list — do not use a generic catch-all list.
+**Template-first rule**: When creating a workspace-specific agent that corresponds to a plugin template agent (e.g., `agents/01-agent-assessment.agent.md`), **start from the template's `tools:` list** and remove only what the specific plan genuinely doesn't need. Never build the `tools:` list from scratch by reading only the plan — MCP namespace declarations are easy to miss in plan text and are already correctly specified in the template.
+
+**MCP tool mapping rule**: For every MCP tool call referenced in the plan, its server namespace must appear in `tools:` using the `namespace/*` wildcard. The Copilot agent runtime only connects MCP servers that are explicitly declared — omitting a namespace means those tools are never callable, and the agent will silently fall back to manual work without any error.
+
+Example: a plan that calls `generate_dotnet_upgrade_assessment` and `FindRecommendedPackageUpgrades` requires:
+
+```yaml
+tools: [microsoft.githubcopilot.appmodernization.mcp/*, Swick.Mcp.Fx2dotnet/*, ...]
+```
+
+**`agent` tool rule**: Include `agent` in `tools:` whenever the plan delegates any work to sub-agents — not only for build/fix loops. Without `agent`, the runtime cannot spawn sub-agents and the orchestrator will be forced to do all work inline.
 
 ## Agent Structure
 
@@ -106,6 +116,16 @@ agents: ['Build Fix']
 ```
 
 Do not implement a build/fix loop inline inside a phase agent — delegate to `Build Fix` instead.
+
+## Sub-Agent Delegation for Research-Heavy Phases
+
+When a phase requires reading many files or building large inventory tables (e.g., enumerating all `.csproj` files in a solution, triaging all packages across every `packages.config`), delegate that work to an `explore` or `general-purpose` sub-agent rather than reading files inline in the orchestrator context.
+
+Accumulating raw file content across many files in a single context window risks triggering a compaction event, which truncates conversation history and degrades the agent's ability to reason over its own prior findings.
+
+**Pattern**: the orchestrator launches research sub-agents that return a **summary table or structured result** — the orchestrator writes that result to disk. The orchestrator should synthesize and persist findings; it should not accumulate raw file content.
+
+Phases that are mutually independent (their findings do not depend on each other) can be launched as concurrent sub-agents to reduce total elapsed time.
 
 ## What NOT to Do
 
