@@ -9,3 +9,6 @@ artifacts/
 # Auto-generated solution files (C# Dev Kit / workspace plugin)
 # Real solution is *.slnx — ignore all legacy .sln files
 *.sln
+
+# Local feedback/reference files — not for source control
+feedback/
