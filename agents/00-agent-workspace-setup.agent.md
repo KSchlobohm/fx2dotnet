@@ -87,6 +87,7 @@ Download entire skill directories:
 4. `launching-iisexpress/SKILL.md` → `{workspaceRoot}/.github/skills/launching-iisexpress/SKILL.md`
 5. `windows-service-migration/SKILL.md` → `{workspaceRoot}/.github/skills/windows-service-migration/SKILL.md`
 6. `upgrade-artifact-conventions/SKILL.md` → `{workspaceRoot}/.github/skills/upgrade-artifact-conventions/SKILL.md`
+7. `create-phase-agent/SKILL.md` → `{workspaceRoot}/.github/skills/create-phase-agent/SKILL.md`
 
 For each skill:
 1. Create the directory if it doesn't exist
@@ -138,6 +139,7 @@ Skills Downloaded:
   ✅ launching-iisexpress (with references)
   ✅ windows-service-migration
   ✅ upgrade-artifact-conventions
+  ✅ create-phase-agent
 
 Status: Ready for assessment
 Next step: Follow workshop instructions to begin assessment workflow
