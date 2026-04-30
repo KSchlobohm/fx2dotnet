@@ -51,7 +51,7 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 | Retrospective | `{stateRoot}/{id}-retrospective.md` | `.fx2dotnet/02-retrospective.md` |
 | Assessment report | `{stateRoot}/analysis.md` | `.fx2dotnet/analysis.md` |
 | Package findings | `{stateRoot}/package-updates.md` | `.fx2dotnet/package-updates.md` |
-| Orchestrator state | `{stateRoot}/plan.md` | `.fx2dotnet/plan.md` |
+| Orchestrator state | `{stateRoot}/dotnet-upgrade-plan.md` | `.fx2dotnet/dotnet-upgrade-plan.md` |
 | Constitution | `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` | (fixed path) |
 
 ## Agent Invocation
