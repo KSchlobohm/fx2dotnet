@@ -21,6 +21,18 @@ You are a read-only planning agent. Your job is to consume the assessment findin
 - Delegate codebase searches to the **Explore** subagent when needed
 - All project paths in the plan MUST be relative to the solution directory — never use absolute paths
 
+<state-file-conventions>
+
+### Path Resolution
+- `{solutionDir}` = parent directory of the resolved solution file path
+- `{stateRoot}` = `{solutionDir}/.fx2dotnet/`
+
+### File Roles
+- `{stateRoot}/03-plan.md` — **Procedure file** (input only). This is the phase procedure document the agent reads to understand its instructions. This agent MUST NOT overwrite or modify `03-plan.md`.
+- `{stateRoot}/dotnet-upgrade-plan.md` — **Output file**. The master migration plan produced by this agent. When the orchestrator invokes this agent and requests a written artifact, the plan is written here — not to `03-plan.md`.
+
+</state-file-conventions>
+
 ## Inputs
 
 You receive from the calling agent:
@@ -249,4 +261,4 @@ Projects containing ServiceBase or TopShelf that will undergo service code migra
 
 ## Output Format
 
-Return the complete migration plan text as your final output.
+Return the complete migration plan text as your final output. When a workspace-specific version of this agent writes this plan to disk, it MUST be written to `{stateRoot}/dotnet-upgrade-plan.md` — never to `{stateRoot}/03-plan.md`.
