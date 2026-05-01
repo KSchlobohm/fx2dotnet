@@ -106,7 +106,8 @@ Parse the `.sln` file to build a complete project list. For each project, note:
 - Which project is the **host application** (the web entry point being migrated)
 - Which projects are the host's **dependency chain** (shared libraries it depends on)
 - Which projects are **other executables** (console services, Windows services, etc.)
-- Which projects use **specialized build tooling** that cannot be migrated (sqlproj, load test)
+- Which projects use **specialized build tooling** that cannot be migrated (`.sqlproj`, Web Performance Testing projects, load test projects)
+- Whether the host is an **ASP.NET Web Application** (ProjectTypeGuid `{349c5851-65df-11da-9384-00065b846f21}`) — these are NOT SDK-converted; the side-by-side upgrade strategy treats the host as frozen code pending phase-out
 
 ### Existing Governance
 - `.github/copilot-instructions.md` — existing repo-level instructions (if any)
@@ -158,13 +159,14 @@ Record all evidence in `{stateRoot}/constitution-progress.md` under Phase 1.
 Using the evidence from Phase 1, build three outputs:
 
 ### Project Scope Classification
-Classify every project in the solution into one of these categories:
+Classify every project in the solution into exactly one of four categories:
 
 | Category | Definition | Migration treatment |
 |---|---|---|
-| **Upgrade target** | The host application and its direct dependency chain | Full migration: SDK convert, package update, multitarget, web migration |
-| **Excluded** | Projects that cannot or should not be modified (e.g., `.sqlproj`, load test projects) | Do not touch. Do not SDK-convert. Leave as-is. |
-| **Bystander** | Other executables (console services, etc.) that share libraries with the target | SDK-convert only (so shared libraries can multitarget). Do NOT multitarget or migrate these — that is a separate effort. |
+| **Upgrade target — host** | The web entry point project (ASP.NET Web Application, ProjectTypeGuid `{349c5851-65df-11da-9384-00065b846f21}`) | **NOT SDK-converted.** The side-by-side upgrade strategy treats the host as frozen code pending phase-out. **Must remain buildable and runnable throughout the migration** — it is the integration test harness; class library changes are validated by running integration tests against the existing host, not a new one. Only make changes required to preserve build/runtime compatibility caused by dependency-chain package updates (binding redirects, API-breaking changes). Do NOT make standalone package upgrades, CVE fixes, or any other improvements. |
+| **Upgrade target — dependency chain** | The host's direct library dependencies | SDK-convert (unifies all projects on PackageReference, eliminates packages.config), package update, multitarget |
+| **Excluded** | Projects with specialized tooling that cannot participate in the migration (`.sqlproj`, Web Performance Testing projects, load test projects) | Do not touch. Do not SDK-convert. Leave as-is. |
+| **Bystander** | Other executables (console services, Windows services, etc.) that share libraries with the target | SDK-convert only (unifies on PackageReference, eliminates packages.config). Only make changes required to preserve build/runtime compatibility caused by dependency-chain package updates (binding redirects, API-breaking changes). Do NOT make standalone package upgrades, CVE fixes, or other improvements. Do NOT multitarget or migrate — that is a separate effort. |
 
 Ask the user to confirm: **"Which project is the upgrade target?"** If the assessment already
 identifies a web host candidate, propose it. The answer defines the scope for all downstream work.
@@ -226,8 +228,8 @@ These become the "Deferred Work" table in Principle 2 of the constitution.
 #### Local DLL Conversion Candidates
 
 If a protected dependency is currently vendored as local DLLs but is also available on NuGet,
-recommend converting to `<PackageReference>` with `NoWarn="NU1701"`. NuGet-based loading is
-cleaner for multitarget projects.
+recommend converting to `<PackageReference>` with `NoWarn="NU1701"`. This aligns with the
+PackageReference unification goal and is cleaner for multitarget projects.
 
 ### Platform Constraints
 
@@ -294,9 +296,10 @@ Open the constitution with a clear scope statement:
   the .NET 10 upgrade targets Windows-only deployment. Linux is deferred.
 
 ### Principle: Upgrade Scope
-- **Upgrade target** — name the host project and its dependency chain explicitly
-- **Excluded projects** — list projects agents must not modify, with reasons
-- **Bystander projects** — list other executables; SDK-convert only
+- **Upgrade target — host** — name the host project; state it is NOT SDK-converted (the side-by-side upgrade strategy treats it as frozen code pending phase-out); **the host must remain buildable and runnable throughout the entire migration** — it is the integration test harness; class library changes are validated by running integration tests against the existing host, not a new one; changes are limited to what is required to preserve compatibility when dependency-chain packages change (binding redirects, API-breaking changes); no CVE fixes or standalone package upgrades
+- **Upgrade target — dependency chain** — name each project; SDK-convert to unify all projects on PackageReference (eliminates the packages.config / PackageReference mix); package update, multitarget
+- **Excluded projects** — list `.sqlproj`, Web Performance Testing, and load test projects; agents must not modify these
+- **Bystander projects** — list other executables; SDK-convert to unify on PackageReference; only make changes required to preserve compatibility caused by dependency-chain package updates (binding redirects, API-breaking changes); no CVE fixes or standalone package upgrades; do not multitarget or migrate
 
 ### Principle: Build Census and Validation
 - Build tool requirements, build census, integration tests, coverage gap policy
@@ -542,11 +545,12 @@ Read `{stateRoot}/constitution-progress.md`:
 
 ### Example: Build Census
 
-**Phase 3 baseline (after SDK conversion):**
+**Phase 3 baseline (after library/bystander SDK conversion — host not converted):**
 > Build census: 12/14 projects pass
-> - ✅ Core, Model, Model.Attachment, Data, Data.Attachment, Domain, WebApi,
+> - ✅ Core, Model, Model.Attachment, Data, Data.Attachment, Domain (dependency chain — SDK-converted)
+>   WebApi (host — NOT SDK-converted, frozen pending phase-out; still passes build)
 >   EmailSenderService, SchedulerService, SynchronizeUserFromOrga, SynchronizeUserFromAd,
->   SyncUserEMBARC
+>   SyncUserEMBARC (bystanders — SDK-converted)
 > - ❌ Database (sqlproj — excluded, expected failure without SSDT)
 > - ❌ LoadTest (excluded, expected failure without VS test tools)
 
@@ -562,11 +566,11 @@ Read `{stateRoot}/constitution-progress.md`:
 > 14 C# projects + 1 sqlproj
 
 **Classification:**
-> - **Upgrade target:** Petronas.Iap.WebApi + dependency chain
->   (Core, Model, Model.Attachment, Data, Data.Attachment, Domain)
+> - **Upgrade target — host:** Petronas.Iap.WebApi (NOT SDK-converted; frozen pending phase-out; compatibility fixes only)
+> - **Upgrade target — dependency chain:** Core, Model, Model.Attachment, Data, Data.Attachment, Domain
 > - **Excluded:** Petronas.Iap.Database (sqlproj), Petronas.Iap.WebApi.LoadTest (load test)
 > - **Bystander:** EmailSenderService, SchedulerService, SynchronizeUserFromOrga,
 >   SynchronizeUserFromAd, AttachmentMigrationService, SyncUserEMBARC
->   (SDK-convert only; do not multitarget or migrate)
+>   (SDK-convert only; compatibility fixes only; no CVE fixes; do not multitarget or migrate)
 
 </examples>
