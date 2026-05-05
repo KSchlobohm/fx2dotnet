@@ -180,12 +180,14 @@ Packages excluded from planning per `.github/fx2dotnet/UPGRADE-CONSTITUTION.md`:
 ## Phase 1: SDK-Style Conversion
 Projects to convert, organized by dependency layer (process layers bottom-up; projects within a layer can be processed in parallel):
 
+Per-project notes MUST include `⚠️ hybrid state expected` for any project with 30+ NuGet dependencies or mixed package types (web frameworks, analyzers, local HintPath libraries). This signals the conversion agent to expect and clean duplicate references before running Build Fix.
+
 ### Layer 1
 1. {project path} — {notes}
 2. {project path} — {notes}
 
 ### Layer 2
-3. {project path} — {notes}
+3. {project path} — {notes, e.g. "⚠️ hybrid state expected — 40+ NuGet deps, mixed analyzers/local libs"}
 
 ...
 
