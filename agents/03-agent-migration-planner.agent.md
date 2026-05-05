@@ -98,6 +98,16 @@ Projects are excluded from SDK conversion if they are:
 
 Web-library projects (libraries that reference web frameworks but do not host) SHOULD receive `needs-sdk-conversion` like any other library.
 
+### 2.5 Determine Baseline Framework
+
+Identify the host application's `<TargetFramework>` value — this becomes the **baseline framework** for all library conversions:
+
+1. Use the **Explore** subagent to read the `<TargetFramework>` (or `<TargetFrameworkVersion>`) from the web-app-host project identified in step 2
+2. Convert legacy format if needed (e.g., `<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>` → `net48`)
+3. Record this as `baselineFramework` in the plan summary
+4. All library projects undergoing SDK conversion MUST use this value as their single-TFM — do NOT specify a different TFM unless there is verified evidence the library requires a different version
+5. Do NOT instruct agents to override the conversion tool's TFM output when it matches the baseline
+
 ### 3. Identify Web Migration Candidates
 
 From the classified projects, identify which project(s) are web-app-hosts:
@@ -162,10 +172,13 @@ Generate a structured plan with these sections:
 ## Summary
 - Solution: {solutionPath}
 - Target: {targetFramework}
+- Baseline Framework: {host app's actual <TargetFramework> value, e.g. net48}
 - Total projects: {count}
 - Projects needing SDK conversion: {count} (includes web-library projects)
 - Web-app-host projects (excluded from SDK conversion): {count}
 - Assessment: provided inline
+
+> **Baseline Framework** is the host application's current `<TargetFramework>`. All library projects MUST use this value as their single-TFM during SDK conversion. The conversion tool's default output should be accepted when it matches this baseline — do NOT override the tool's TFM without verifying against the host app first.
 
 ### Constitution Exclusions
 (Omit this section if no constitution exists or no packages were excluded.)

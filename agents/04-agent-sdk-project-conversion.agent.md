@@ -102,8 +102,20 @@ After the tool completes:
   - Do not read the whole project file and do not inspect NuGet-related content.
   - Report the conversion outcome at a high level based on the tool result (for example, that the project was converted to SDK-style format).
 
+### 4.1 Verify Target Framework
+
+After confirming SDK-style format, read only the `<TargetFramework>` element from the converted project file.
+
+- If the caller provided a `baselineFramework` (the host app's TFM), compare the tool's output TFM against it:
+  - **If they match** — accept the tool's output as-is. Do NOT override.
+  - **If they differ** — report the discrepancy to the user (e.g., "Tool set `net48` but baseline is `net472`"). Ask whether to keep the tool's value or change to match the baseline. Do NOT silently override.
+- If no `baselineFramework` was provided, accept the tool's output TFM without modification.
+
+> **Rationale:** The conversion tool's default TFM is typically correct (it reflects the host app's framework). Plan-level instructions to override the tool's TFM have historically caused mismatches. Always verify against the host before overriding.
+
 Update the `## SDK Conversion` section via the `edit` tool:
 - `conversionStatus`: "completed"
+- `targetFramework`: the final TFM value (after verification)
 
 If verification shows conversion was incomplete or failed, stop and ask the user how to proceed.
 
