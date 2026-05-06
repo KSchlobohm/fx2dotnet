@@ -47,12 +47,16 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 | Agent file | `.github/agents/{id}-agent-{purpose}.agent.md` | `.github/agents/01-agent-assessment.agent.md` |
 | Sub-agent file | `.github/agents/subagent-{purpose}.agent.md` | `.github/agents/subagent-build-fix.agent.md` |
 | Plan file | `{stateRoot}/{id}-plan.md` | `.fx2dotnet/02-plan.md` |
-| Progress file | `{stateRoot}/{id}-progress.md` | `.fx2dotnet/02-progress.md` |
+| Progress file (markdown) | `{stateRoot}/{id}-progress.md` | `.fx2dotnet/02-progress.md` |
+| Progress file (JSON, script-parsed) | `{stateRoot}/{id}-progress.json` | `.fx2dotnet/05-progress.json` |
+| Progress template | `templates/{id}-progress-template.md` | `templates/05-progress-template.md` |
 | Retrospective | `{stateRoot}/{id}-retrospective.md` | `.fx2dotnet/02-retrospective.md` |
 | Assessment report | `{stateRoot}/analysis.md` | `.fx2dotnet/analysis.md` |
 | Package findings | `{stateRoot}/package-updates.md` | `.fx2dotnet/package-updates.md` |
 | Orchestrator state | `{stateRoot}/dotnet-upgrade-plan.md` | `.fx2dotnet/dotnet-upgrade-plan.md` |
 | Constitution | `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` | (fixed path) |
+
+> **Progress file format:** Use `.md` for phases 01–04, whose progress is tracked in prose and not consumed by automation. Use `.json` for phases 05 and above, where a PowerShell validation script reads the file to determine migration status. The schema for each JSON progress file is defined in a corresponding progress template in the `templates/` folder.
 
 ## Agent Invocation
 
