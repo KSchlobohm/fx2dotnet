@@ -1,6 +1,6 @@
 ---
 name: create-phase-agent
-description: "Pattern for creating a phase execution agent from a plan file. Use when: asked to create an agent to execute a plan, implement a phase, or carry out assessment/migration work. Defines required frontmatter, file naming, plan execution behavior, progress tracking, test evidence, and phase structure that all phase agents must follow."
+description: "Creates a workspace-specific Copilot CLI phase execution agent in .github/agents from a plan file and plugin template agent. Use when: asked to generate or adapt an fx2dotnet phase agent to execute assessment or migration work in a repository. Defines CLI frontmatter adaptation, tool selection, file naming, plan execution behavior, progress tracking, test evidence, and phase structure."
 ---
 
 # Create Phase Agent
@@ -25,15 +25,26 @@ Examples:
 
 ```yaml
 ---
-name: "{Id} Agent {Purpose}"
+name: "{id} {Purpose}"
 description: "One sentence describing what this agent does and when to use it."
 tools: [<tools required by the plan>]
 ---
 ```
 
+**CLI generation rule**: This skill creates **workspace-specific Copilot CLI agents** in `.github/agents/` from the plugin template agents in `agents/`. Treat the plugin agent as source material, not as the final runtime file. Preserve the template's behavior, but adapt frontmatter and tool names for Copilot CLI.
+
+When adapting a template agent into a workspace-specific CLI agent:
+
+- Rewrite `target: vscode` to `target: github-copilot`, or omit `target` entirely if the agent should remain usable across GitHub Copilot environments
+- Preserve CLI-relevant frontmatter such as `name`, `description`, `tools`, `model`, `infer`, `user-invocable`, `disable-model-invocation`, and `mcp-servers` when present
+- Do not add new VS Code-only fields such as `argument-hint` or `handoffs` to the generated CLI agent
+- If a source template already contains extra IDE-specific fields, do not rely on them for CLI correctness
+
 **Template-first rule**: When creating a workspace-specific agent that corresponds to a plugin template agent (e.g., `agents/01-agent-assessment.agent.md`), **start from the template's `tools:` list** and remove only what the specific plan genuinely doesn't need. Never build the `tools:` list from scratch by reading only the plan — MCP namespace declarations are easy to miss in plan text and are already correctly specified in the template.
 
 **MCP tool mapping rule**: For every MCP tool call referenced in the plan, its server namespace must appear in `tools:` using the `namespace/*` wildcard. The Copilot agent runtime only connects MCP servers that are explicitly declared — omitting a namespace means those tools are never callable, and the agent will silently fall back to manual work without any error.
+
+Having the namespace in `tools:` is necessary but not sufficient for Copilot CLI. The corresponding MCP server must also exist in the workspace `.mcp.json` or the user's CLI MCP configuration. If the server is missing, stop and report the missing prerequisite rather than generating an unusable agent.
 
 Example: a plan that calls `generate_dotnet_upgrade_assessment` and `FindRecommendedPackageUpgrades` requires:
 
@@ -42,6 +53,13 @@ tools: [microsoft.githubcopilot.appmodernization.mcp/*, Swick.Mcp.Fx2dotnet/*, .
 ```
 
 **`agent` tool rule**: Include `agent` in `tools:` whenever the plan delegates any work to sub-agents — not only for build/fix loops. Without `agent`, the runtime cannot spawn sub-agents and the orchestrator will be forced to do all work inline.
+
+**Tool normalization rule**: When generating a Copilot CLI agent from a VS Code-oriented template, convert IDE-scoped tools to CLI-compatible names.
+
+- Replace `vscode/askQuestions` with `ask_user`
+- Keep cross-product aliases such as `read`, `edit`, `search`, and `agent`
+- Prefer `execute` or shell-compatible aliases over IDE-specific terminal tool names when adding new command-execution capabilities
+- Remove `todo` unless the generated agent explicitly depends on a CLI capability that provides it
 
 ## Agent Structure
 
@@ -109,11 +127,9 @@ Once the plan file is identified, read it before beginning any work. The agent e
 
 ## Subagents
 
-Phase agents that involve building, compiling, or verifying build health must declare the `Build Fix` agent in their frontmatter and delegate all build/fix loops to it:
+Phase agents that involve building, compiling, or verifying build health must include `agent` in `tools:` and explicitly instruct the runtime to delegate all build/fix loops to the `Build Fix` custom agent.
 
-```yaml
-agents: ['Build Fix']
-```
+If a source template already contains an `agents:` allowlist, you may preserve it for parity, but generated Copilot CLI agents must not depend on that field for correctness because CLI behavior should be driven by the available `agent` tool and explicit delegation instructions in the agent body.
 
 Do not implement a build/fix loop inline inside a phase agent — delegate to `Build Fix` instead.
 
