@@ -6,7 +6,7 @@ to track which layers are complete, in progress, or deferred.
 
 ## How It Works
 
-1. **Step 1 (agent creation)** produces the initial progress file from the plan — all layers start as `pending`.
+1. **Step 1 (agent creation)** produces the initial progress file from the Phase 06 plan artifact — all layers start as `pending`.
 2. **Each agent invocation** reads the file, finds the next `pending` layer, processes it, and updates the status.
 3. **The validation script** parses this file to report what's done vs. what remains.
 
@@ -23,7 +23,7 @@ to track which layers are complete, in progress, or deferred.
       "id": 1,
       "description": "short description from plan",
       "projects": [
-        { "path": "relative/path/to/Project.csproj", "from": "net48", "to": "net48;net10.0" }
+        { "path": "relative/path/to/Project.csproj", "from": "net48", "to": "net48;net10.0-windows" }
       ],
       "status": "pending",
       "validation": null,
@@ -40,7 +40,7 @@ to track which layers are complete, in progress, or deferred.
 | Field | Type | Description |
 |-------|------|-------------|
 | `phase` | string | Always `"06-multitarget"` |
-| `sourcePlan` | string | Relative path to the plan file |
+| `sourcePlan` | string | Relative path to the Phase 06 plan artifact that defines the layer order and project list |
 | `lastUpdated` | string (ISO 8601) | Timestamp of last modification |
 | `updatedBy` | string | `"agent"` or `"manual"` |
 | `layers` | array | Ordered list of layer objects |
@@ -62,7 +62,7 @@ to track which layers are complete, in progress, or deferred.
 |-------|------|-------------|
 | `path` | string | Relative path to the `.csproj` file from the solution directory |
 | `from` | string | Original target framework (e.g., `"net48"`) |
-| `to` | string | New multitarget value (e.g., `"net48;net10.0"`) |
+| `to` | string | New multitarget value (e.g., `"net48;net10.0"` or `"net48;net10.0-windows"`) |
 
 ## Status Definitions
 
@@ -79,7 +79,9 @@ to track which layers are complete, in progress, or deferred.
 A layer is considered validated (`"pass"`) only when both of the following succeed for every project in the layer:
 
 1. `dotnet build -f net48` — the .NET Framework target builds without errors.
-2. `dotnet build -f net10.0` — the modern .NET target builds without errors.
+2. `dotnet build -f <modernTarget>` — the modern .NET target recorded in that project's `to` value builds without errors (for example, `net10.0` or `net10.0-windows`).
+
+The validation script should derive `<modernTarget>` from each project's `to` field instead of assuming a fixed modern TFM for the entire phase.
 
 ## Rules
 
@@ -87,7 +89,7 @@ A layer is considered validated (`"pass"`) only when both of the following succe
 2. **No skipping.** Layers are processed in order unless the plan explicitly allows parallel layers.
 3. **Blocked stops the loop.** If a layer is `blocked`, the agent must stop. The human reviews and either resolves the block or changes the status to `deferred` before rerunning.
 4. **Deferred is terminal.** A `deferred` layer is not retried in this phase.
-5. **Both build targets required.** The agent must record `validation: "pass"` (both `net48` and `net10.0` succeed) before setting `status: "done"`.
+5. **Both build targets required.** The agent must record `validation: "pass"` only after `net48` and the modern target declared for that project both succeed.
 
 ## Example: Completed Progress File
 
@@ -102,7 +104,7 @@ A layer is considered validated (`"pass"`) only when both of the following succe
       "id": 1,
       "description": "Core domain library",
       "projects": [
-        { "path": "src/MyApp.Domain/MyApp.Domain.csproj", "from": "net48", "to": "net48;net10.0" }
+        { "path": "src/MyApp.Domain/MyApp.Domain.csproj", "from": "net48", "to": "net48;net10.0-windows" }
       ],
       "status": "done",
       "validation": "pass",
@@ -123,7 +125,7 @@ A layer is considered validated (`"pass"`) only when both of the following succe
       "id": 3,
       "description": "Shared utilities with platform-specific dependencies",
       "projects": [
-        { "path": "src/MyApp.Utilities/MyApp.Utilities.csproj", "from": "net48", "to": "net48;net10.0" }
+        { "path": "src/MyApp.Utilities/MyApp.Utilities.csproj", "from": "net48", "to": "net48;net10.0-windows" }
       ],
       "status": "blocked",
       "validation": "fail",

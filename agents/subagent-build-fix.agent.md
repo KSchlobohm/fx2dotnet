@@ -188,6 +188,8 @@ Common .NET build error codes and typical fixes:
 
 **SQL project framework version mismatch** — `.sqlproj` files contain a `<TargetFrameworkVersion>` metadata field inherited from Visual Studio project templates. This field has no effect on SQL compilation, DACPAC output, or deployment behavior, but MSBuild evaluates it during solution builds and will flag a targeting pack missing constraint if the version does not match an installed pack. Fix: update `<TargetFrameworkVersion>` in the `.sqlproj` file to match the target framework version used by the rest of the solution (e.g., `v4.8`). The change is safe — SQL schema and build output are unaffected.
 
+**CS0234 / CS0246 from orphaned `using` directives** — when multiple files report CS0234 or CS0246 for a namespace that is not present in any package reference or project reference (e.g., `System.Activities`, `WebGrease.Css.Extensions`, `Microsoft.Ajax.Utilities`), the `using` directive is likely an unused relic from a removed dependency. Fix: remove the `using` line. These are safe to batch — they count as one logical fix per namespace. Verify after removal that no other code in the file depends on the namespace.
+
 For unknown or non-listed errors:
 1. Parse the exact compiler message, file, and line context.
 2. Propose the smallest plausible fix and apply it.

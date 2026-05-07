@@ -113,9 +113,19 @@ After confirming SDK-style format, read only the `<TargetFramework>` element fro
 
 > **Rationale:** The conversion tool's default TFM is typically correct (it reflects the host app's framework). Plan-level instructions to override the tool's TFM have historically caused mismatches. Always verify against the host before overriding.
 
+### 4.2 Detect Windows Platform Properties
+
+While reading the project file to verify the TFM, also check for Windows desktop properties:
+- `<UseWindowsForms>true</UseWindowsForms>`
+- `<UseWPF>true</UseWPF>`
+- `<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>`
+
+If any of these are present, the project requires the `-windows` TFM suffix when multitargeted to modern .NET (e.g., `net10.0-windows` instead of `net10.0`). Record this finding in the state file so the multitarget agent can consume it without a trial-and-error build failure.
+
 Update the `## SDK Conversion` section via the `edit` tool:
 - `conversionStatus`: "completed"
 - `targetFramework`: the final TFM value (after verification)
+- `windowsPlatform`: true if any Windows desktop property is present, false otherwise
 
 If verification shows conversion was incomplete or failed, stop and ask the user how to proceed.
 
