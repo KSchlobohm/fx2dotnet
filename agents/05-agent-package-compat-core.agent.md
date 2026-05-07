@@ -71,13 +71,44 @@ Update `stateFile` using the `edit` tool (the assessment agent may have already 
 - `targetFramework`
 - `alwaysContinue: false` (or load persisted value from `preferencesFile` under `[package-compat]` section)
 - `chunkedUpdateQueue: []` (the received chunked update queue)
-- `chunkResults: []` (each result: `{ chunkId, status, packagesUpdated, buildFixOutcome }`)
+- `chunkResults: []` (each result: `{ chunkId, status, packagesApplied, buildFixOutcome }`)
+
+`packagesApplied` entries use the following schema:
+- `id` — package name
+- `from` — original version
+- `to` — new version string **or** `"removed"` if the package was removed due to zero source usage
+- `reason` — (optional) explanation, e.g. `"unused — no source references"`
 
 ## 2. Chunked Update + Build Fix Loop
 
 For each chunk in plan order:
+
+### Step 0 — Usage Verification (per package, per project)
+
+Before editing any project file, verify that each package in the chunk is actually referenced in source code:
+
+1. **Determine the namespace to search for:**
+   - Use the `namespace` field from the package's compatibility card if present.
+   - Otherwise use the package name itself as a best-effort namespace prefix.
+   - If the namespace cannot be determined, skip the check and proceed with the upgrade (fail-safe — never block an upgrade due to missing metadata).
+
+2. **Grep for active source usage:**
+   - Search `{project-dir}/**/*.cs` for `using {namespace}` and fully-qualified type references.
+   - Commented-out `using` statements count as **unused**.
+
+3. **If zero active matches found:**
+   - Remove the `<PackageReference>` from the project file instead of bumping the version.
+   - Record: `{ "id": "...", "from": "x.y.z", "to": "removed", "reason": "unused — no source references" }`
+   - Invoke Build Fix after removal. If the build fails (e.g., the package was a needed transitive dependency), revert the removal and fall back to the planned version upgrade.
+
+4. **If active matches found:** proceed with the planned version bump.
+
+> The check is **per-project**: the same package may be removed from one project but upgraded in another within the same chunk.
+
+### Steps 1–5
+
 1. Read the target project/props files before editing
-2. Apply only the package version updates in that chunk
+2. Apply only the package version updates (or removals from step 0) in that chunk
 3. Invoke the Build Fix subagent on the same solution/project target
 4. Record build result and any code fixes from Build Fix in `chunkResults` — update `stateFile` via the `edit` tool
 5. If Build Fix cannot complete without substantial risky changes, stop and ask the user
@@ -102,7 +133,8 @@ Failure policy:
 ## 3. Done
 
 When queue completes (or process is stopped by user), report:
-- Packages changed with old → new versions
+- **Upgraded** packages: old → new versions
+- **Removed (unused)** packages: version removed and reason
 - Chunk-by-chunk results and Build Fix outcomes
 - Any skipped or unresolved items
 - Files modified
@@ -126,7 +158,8 @@ If the user chooses to commit, present the **Commit Changes** handoff.
 
 <output_format>
 At each chunk checkpoint, provide:
-- Chunk applied (package IDs and versions)
+- **Upgraded** packages in this chunk: old → new versions
+- **Removed (unused)** packages in this chunk: name, version removed, reason
 - Build Fix result summary
 - Decision requested: continue, review/commit, or skip-all-prompts
 
