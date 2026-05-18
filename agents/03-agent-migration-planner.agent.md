@@ -4,7 +4,8 @@ description: "Synthesizes assessment findings into an actionable migration plan.
 tools: [agent]
 agents: ['Explore']
 user-invocable: false
-argument-hint: "Required: assessmentContent (full assessment text), topologicalProjects (ordered list of project paths), solutionPath, targetFramework"
+model: claude-sonnet-4.6
+argument-hint: "Required: assessmentContent(full assessment text), topologicalProjects (ordered list of project paths), solutionPath, targetFramework"
 ---
 
 # Migration Planner

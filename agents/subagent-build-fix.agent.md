@@ -4,6 +4,7 @@ description: Runs an msbuild/fix loop — builds the project, diagnoses errors, 
 argument-hint: Specify the .sln, .csproj, .vbproj, or .fsproj file to build
 target: vscode
 user-invocable: false
+model: claude-sonnet-4.6
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
 agents: ['Explore', 'agent']
 handoffs:

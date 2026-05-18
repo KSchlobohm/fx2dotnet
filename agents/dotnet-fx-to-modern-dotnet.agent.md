@@ -4,6 +4,7 @@ description: "Orchestrates end-to-end modernization flow: run assessment, create
  and ASP.NET Framework to ASP.NET Core web migration."
 argument-hint: "Specify the .sln/.slnx path and optional target framework (default: net10.0)"
 target: vscode
+model: claude-sonnet-4.6
 tools: [vscode/askQuestions, read, agent, edit, search, todo]
 agents: ['01 Assessment', '03 Migration Planner', '04 SDK Project Conversion', '05 Package Compatibility', '06 Multitarget Migration', '07 ASP.NET Web Migration', 'Explore']
 handoffs:
@@ -65,6 +66,8 @@ Project classifications live in `.fx2dotnet/analysis.md` (written by Assessment)
 - After multitarget migration completes, invoke **07 ASP.NET Web Migration** using the plan's web host candidate
 - Linux and cross-platform support is a separate concern — the goal of this migration is to get from .NET Framework to modern .NET on Windows. Do not remove `-windows` TFM suffixes, add platform-conditional code, or introduce Linux hosting packages (e.g., `Microsoft.Extensions.Hosting.Systemd`) during this migration. Cross-platform adaptation is a post-migration activity.
 - Stop and ask the user when a required input is missing, a classification is uncertain, or a decision cannot be derived safely
+- Prior-phase integration test failures or gaps are **blocking prerequisites** for the next phase, not advisories. If a prior-phase progress file or retrospective records an open integration test gap, surface it to the user and require explicit acknowledgment before starting the next phase.
+- At the start of each phase, state which model tier will be used for sub-agent invocations (`claude-sonnet-4.6` for migration agents, `claude-haiku-4.5` for lightweight discovery subagents). This gives the user an opportunity to correct the selection before cost is incurred. Any deviation to a premium-tier model requires explicit user approval.
 </rules>
 
 <workflow>
@@ -101,6 +104,7 @@ Create `.fx2dotnet/dotnet-upgrade-plan.md` using the `edit` tool with:
 - packageCompatStatus: "not-started"
 - multitargetStatus: "not-started"
 - aspnetMigrationStatus: "not-started"
+- webMigrationBaselineStatus: "not-run"
 
 Do not duplicate data that lives in other `.fx2dotnet/` files (assessment report, project classifications, package compatibility data). The orchestrator re-reads those files when resuming.
 
@@ -192,6 +196,10 @@ Update `multitargetStatus` and `lastCompletedPhase: "multitarget"` in `.fx2dotne
 Using the plan's Phase 4 web host candidate(s):
 - If the plan identified a single confirmed web host, use it
 - If multiple candidates or user confirmation needed, ask the user to choose
+
+**Pre-flight check:** Before invoking **07 ASP.NET Web Migration**, read `.fx2dotnet/dotnet-upgrade-plan.md` and check for any open validation gaps from prior phases (fields containing `"gap"`, `"failed"`, or `"blocked"`). If any open gap exists, present it to the user and require explicit acknowledgment before proceeding. Update `webMigrationBaselineStatus` with the result once the baseline is recorded by the phase agent.
+
+**Model disclosure:** State to the user that Phase 07 will use sub-agents running `claude-sonnet-4.6`. Confirm this is acceptable before continuing.
 
 Invoke **07 ASP.NET Web Migration** with:
 - the resolved web host project path

@@ -3,7 +3,8 @@ name: "07 ASP.NET Web Migration"
 description: "Plan and execute a web-project-first migration from ASP.NET (.NET Framework) to ASP.NET Core by inventorying endpoints, scaffolding a new ASP.NET Core host, and porting artifacts incrementally. Use when: migrate a System.Web Web API or MVC app to ASP.NET Core, replace a legacy web host with a new ASP.NET Core project, inventory endpoints before migration, move an old web application onto libraries that already work on ASP.NET Core."
 tools: [agent, read, edit, search, todo, vscode/askQuestions]
 user-invocable: false
-argument-hint: "Required: legacy web project path (host .csproj or host folder). Optional: solution path and target framework"
+model: claude-sonnet-4.6
+argument-hint: "Required: legacy web project path(host .csproj or host folder). Optional: solution path and target framework"
 agents: ["Legacy Web Route Inventory", "Build Fix"]
 ---
 
@@ -135,6 +136,25 @@ Before implementation, compare attribute routes and convention routes so that no
 
 Once the user approves the plan, create a new ASP.NET Core web application project rather than converting the old host in place unless the user explicitly asks for an in-place migration.
 
+### Migration Strategy Decision
+
+Before creating any new project file, document the replacement strategy in the `## Web Migration` section of `.fx2dotnet/{ProjectName}.md`:
+
+- **Side-by-side** (default): Create a new project alongside the legacy host. Both apps remain runnable simultaneously throughout the migration. Name the new project so they can coexist (e.g., `MyApp.Core`).
+- **In-place**: Convert the existing host project directly. The original is permanently replaced from the first slice commit — it cannot be run from the working tree after that point. Only use if explicitly requested by the user.
+
+Record the chosen strategy as `migrationStrategy: side-by-side` or `migrationStrategy: in-place` in the `## Web Migration` section.
+
+### Pre-Migration Baseline
+
+Before committing any slice, run the existing integration test against the **current, unmodified legacy app** via a subagent and record the result in the `## Web Migration` section under `baselineStatus`:
+
+- **Passed**: Record `baselineStatus: passed`. This result is the correctness target for the migrated app.
+- **Failed**: Stop and report the failure to the user. Do not begin migration work against a broken baseline unless the user explicitly acknowledges the failure and accepts the gap. Record `baselineStatus: failed-accepted` if the user proceeds.
+- **No test available**: Record `baselineStatus: no-test`. Runtime validation will rely on the startup smoke test only.
+
+This baseline requirement applies regardless of whether in-place or side-by-side strategy is used.
+
 The new project should:
 
 - Use SDK-style project format.
@@ -166,6 +186,7 @@ For each slice:
 - Reuse existing library code instead of re-implementing it in the host.
 - Document deliberate behavior changes in the `## Web Migration` section of `.fx2dotnet/{ProjectName}.md`.
 - **After completing each slice, immediately delegate to the `Build Fix` agent** targeting the new ASP.NET Core host project. Pass the `.csproj` path of the new host project as the argument. Do not proceed to the next slice until the build is clean.
+- **For structural slices** (bootstrap/DI, middleware, auth, serialization, each controller group, and any slice that changes host startup, routing, or DI registrations): after the build passes, delegate a **startup validation** to a subagent. The subagent must run `dotnet run --project <newHostProject>` with a 60-second timeout, confirm the process starts and binds to its configured port without crashing, then terminate the process. Record the result in the `## Web Migration` section under `startupStatus`. A startup crash is a **blocking failure** — do not mark the slice done or proceed to the next slice until the crash is resolved.
 - If `Build Fix` reports errors that cannot be resolved within the current slice boundary (for example, a missing library API or an unsupported type), record the blocker in the migration plan and stop for user input before continuing.
 
 ## Framework-Specific Guidance
@@ -177,17 +198,37 @@ For each slice:
 
 If the legacy project contains Web Forms, `.aspx`, `HttpModules`, `HttpHandlers`, or other platform-specific UI/runtime features that do not have a direct ASP.NET Core path, call that out immediately and ask whether the goal is API-only migration, Razor rewrite, or staged coexistence.
 
+## Pattern Audit Rule
+
+When a fix addresses a **structural migration category** — an issue type that can affect any file of the same kind (examples: `[NonAction]` on public non-route methods in `[ApiController]` subclasses; return type mismatches on action methods; missing route attributes; duplicate action conflicts) — do not treat the fix as a single-file correction. After applying the fix to one file:
+
+1. Run a project-wide search across all files of the same type (e.g., all controller files) for the same pattern.
+2. Apply the fix to every affected file before continuing to the next slice.
+3. Record the pattern in the `## Web Migration` section under `### Structural Patterns Fixed` so subsequent slices are aware.
+
+A structural pattern missed in one file and carried into subsequent slices accumulates silently and will produce a startup crash or runtime failure that is invisible until the app is exercised.
+
 ## Validation
+
+Slice completion requires all applicable gates to pass — a slice is **not done** until every required gate clears:
+
+| Gate | When required | How to validate |
+|------|---------------|-----------------|
+| **Build gate** | Every slice | `dotnet build` exits 0; delegate via `Build Fix` agent |
+| **Startup gate** | Structural slices (bootstrap, middleware, auth, serialization, each controller group, any slice affecting startup/routing/DI) | `dotnet run` starts, binds to port, does not crash within 60 s; delegate via subagent |
+| **Integration gate** | Phase close | Integration test script (e.g., `test-api.ps1`) returns PASS |
+
+Do not advance to the next slice if the startup gate fails. Record the failure under `startupStatus` in the `## Web Migration` section and resolve it before continuing.
 
 After each meaningful migration step:
 
 - Reconcile the new endpoint surface against the inventory.
-- Delegate a build to the `Build Fix` agent for the new host project. Do not continue with the next slice until the build is clean.
 - Run relevant tests when available.
 - Record incomplete endpoints, temporary stubs, and known gaps.
 
-Before declaring completion, verify:
+Before declaring phase completion, verify:
 
+- Integration test passes (integration gate cleared).
 - Every in-scope legacy endpoint is implemented, intentionally retired, or explicitly deferred.
 - Authentication and authorization behavior has been reviewed.
 - Startup and configuration parity has been reviewed.
