@@ -43,8 +43,8 @@ to track which slices are complete, in progress, or deferred.
 |-------|------|-------------|
 | `phase` | string | Always `"07-aspnet-web-migration"` |
 | `sourcePlan` | string | Relative path to the plan file |
-| `legacyProject` | string | Relative path to the legacy ASP.NET `.csproj` file |
-| `newHostProject` | string | Relative path to the new ASP.NET Core `.csproj` file |
+| `legacyProject` | string | Relative path to the legacy ASP.NET `.csproj` file. Retained for side-by-side behavioral comparison — agents must never delete this project. |
+| `newHostProject` | string | Relative path to the new ASP.NET Core `.csproj` file. This is the integration test target for phase 07+. |
 | `lastUpdated` | string (ISO 8601) | Timestamp of last modification |
 | `updatedBy` | string | `"agent"` or `"manual"` |
 | `slices` | array | Ordered list of slice objects |

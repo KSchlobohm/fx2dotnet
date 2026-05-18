@@ -301,12 +301,20 @@ Open the constitution with a clear scope statement:
 - **Upgrade target — dependency chain** — name each project; SDK-convert to unify all projects on PackageReference (eliminates the packages.config / PackageReference mix); package update, multitarget
 - **Excluded projects** — list `.sqlproj`, Web Performance Testing, and load test projects; agents must not modify these
 - **Bystander projects** — list other executables; SDK-convert to unify on PackageReference; only make changes required to preserve compatibility caused by dependency-chain package updates (binding redirects, API-breaking changes); no CVE fixes or standalone package upgrades; do not multitarget or migrate
+- **Legacy host retention** — no agent may delete, rename, or remove the legacy host project from the solution. Removal is exclusively a user decision made after the migration is complete and the user has verified behavioral equivalence. Both the legacy host and the new ASP.NET Core host must coexist in the solution throughout the migration so the user can perform side-by-side behavioral comparison at any time.
 
 ### Principle: Build Census and Validation
 - Build tool requirements, build census, integration tests, coverage gap policy
 - The constitution must state: all build validation during this upgrade must use
   `msbuild <solution>.sln` for full-solution builds. Per-project `dotnet build` is permitted
   only for targeted diagnostic checks, not as evidence of solution-wide build health.
+- **Test target identification** — the progress JSON for each phase must record a
+  `testTargetProject` field naming the `.csproj` that integration tests run against.
+  For phases 05–06, the test target is the legacy host (validating that library changes
+  don't break existing behavior). For phase 07+, the test target is the new ASP.NET Core
+  host. If the progress JSON names a test target, agents MUST use it as the authoritative
+  project path when invoking the Integration Test agent. If absent, fall back to structural
+  inference: the SDK-style web project is the new app; the non-SDK web project is the legacy host.
 
 ### Application Sections (flow from the principles)
 - **Protected Dependency Matrix** — consequence of Principle 1; table with evidence

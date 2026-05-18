@@ -16,6 +16,7 @@ to track which chunks are complete, in progress, or deferred.
 {
   "phase": "05-package-updates",
   "sourcePlan": ".fx2dotnet/05-plan.md",
+  "testTargetProject": "relative/path/to/LegacyHost.csproj",
   "lastUpdated": "2026-05-04T14:30:00Z",
   "updatedBy": "agent | manual",
   "chunks": [
@@ -41,6 +42,7 @@ to track which chunks are complete, in progress, or deferred.
 |-------|------|-------------|
 | `phase` | string | Always `"05-package-updates"` |
 | `sourcePlan` | string | Relative path to the plan file |
+| `testTargetProject` | string | Relative path to the `.csproj` used for integration test validation. For phases 05–06 this is the legacy host; the Integration Test agent uses this as the authoritative project path. |
 | `lastUpdated` | string (ISO 8601) | Timestamp of last modification |
 | `updatedBy` | string | `"agent"` or `"manual"` |
 | `chunks` | array | Ordered list of chunk objects |

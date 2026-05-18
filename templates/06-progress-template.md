@@ -16,6 +16,7 @@ to track which layers are complete, in progress, or deferred.
 {
   "phase": "06-multitarget",
   "sourcePlan": ".fx2dotnet/06-plan.md",
+  "testTargetProject": "relative/path/to/LegacyHost.csproj",
   "lastUpdated": "2026-05-04T14:30:00Z",
   "updatedBy": "agent | manual",
   "layers": [
@@ -41,6 +42,7 @@ to track which layers are complete, in progress, or deferred.
 |-------|------|-------------|
 | `phase` | string | Always `"06-multitarget"` |
 | `sourcePlan` | string | Relative path to the Phase 06 plan artifact that defines the layer order and project list |
+| `testTargetProject` | string | Relative path to the `.csproj` used for integration test validation. For phases 05–06 this is the legacy host; the Integration Test agent uses this as the authoritative project path. |
 | `lastUpdated` | string (ISO 8601) | Timestamp of last modification |
 | `updatedBy` | string | `"agent"` or `"manual"` |
 | `layers` | array | Ordered list of layer objects |
