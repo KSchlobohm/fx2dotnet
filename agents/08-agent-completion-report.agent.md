@@ -3,7 +3,8 @@ name: "08 Completion Report"
 description: "Produces a final migration completion report by reading all phase progress files and the migration plan. Summarizes what was completed, what was intentionally deferred and why, and provides a concrete production-readiness path. Use at the end of Phase 07 (Web Migration) to generate a single artifact that answers: what was migrated, what was deferred, and how do we take this application to production."
 tools: [read, edit, agent]
 user-invocable: false
-argument-hint: "Required: solutionPath. Reads .fx2dotnet/05-progress.json, .fx2dotnet/06-progress.json, .fx2dotnet/07-progress.json, .fx2dotnet/dotnet-upgrade-plan.md, and .github/fx2dotnet/UPGRADE-CONSTITUTION.md from the solution directory."
+model: claude-sonnet-4.6
+argument-hint:"Required: solutionPath. Reads .fx2dotnet/05-progress.json, .fx2dotnet/06-progress.json, .fx2dotnet/07-progress.json, .fx2dotnet/dotnet-upgrade-plan.md, and .github/fx2dotnet/UPGRADE-CONSTITUTION.md from the solution directory."
 ---
 
 # Completion Report Agent

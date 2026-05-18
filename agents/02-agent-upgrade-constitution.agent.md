@@ -3,7 +3,8 @@ name: "02 Upgrade Constitution"
 description: "Establishes inviolable upgrade principles BEFORE the migration plan is created. These principles are scoped exclusively to the upgrade task — they govern agents performing the .NET Framework → modern .NET migration and do NOT restrict unrelated code changes in the repository. Reads the assessment, actual project files, and NuGet metadata to determine which dependencies can stay on .NET 10 (native or compat-load). Drafts a principle-driven upgrade constitution that governs all downstream planning and execution. The planner (02c) must read and obey the constitution. Runs after assessment (01), before planning (02c)."
 tools: [read, edit, search, powershell, agent]
 agents: ['Explore']
-argument-hint: "No arguments required — reads from {solutionDir}/.fx2dotnet/ state files and actual project files"
+model: claude-sonnet-4.6
+argument-hint:"No arguments required — reads from {solutionDir}/.fx2dotnet/ state files and actual project files"
 ---
 
 # 02b Upgrade Constitution Agent

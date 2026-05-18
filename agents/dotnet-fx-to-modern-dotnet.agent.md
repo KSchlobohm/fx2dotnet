@@ -4,6 +4,7 @@ description: "Orchestrates end-to-end modernization flow: run assessment, create
  and ASP.NET Framework to ASP.NET Core web migration."
 argument-hint: "Specify the .sln/.slnx path and optional target framework (default: net10.0)"
 target: vscode
+model: claude-sonnet-4.6
 tools: [vscode/askQuestions, read, agent, edit, search, todo]
 agents: ['01 Assessment', '03 Migration Planner', '04 SDK Project Conversion', '05 Package Compatibility', '06 Multitarget Migration', '07 ASP.NET Web Migration', 'Explore']
 handoffs:
