@@ -4,7 +4,7 @@ description: "Applies a pre-built package compatibility plan to a .NET solution.
 argument-hint: "Specify the .sln path, target framework (e.g. net10.0), and the package compatibility plan (chunked update queue with compatibility cards)."
 target: vscode
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
-agents: ['Build Fix']
+agents: ['Build Fix', 'Integration Test']
 user-invocable: false
 model: claude-sonnet-4.6
 handoffs:

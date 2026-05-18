@@ -6,7 +6,7 @@ argument-hint: "Specify the .sln/.slnx path and optional target framework (defau
 target: vscode
 model: claude-sonnet-4.6
 tools: [vscode/askQuestions, read, agent, edit, search, todo]
-agents: ['01 Assessment', '03 Migration Planner', '04 SDK Project Conversion', '05 Package Compatibility', '06 Multitarget Migration', '07 ASP.NET Web Migration', 'Explore']
+agents: ['01 Assessment', '03 Migration Planner', '04 SDK Project Conversion', '05 Package Compatibility', '06 Multitarget Migration', '07 ASP.NET Web Migration', 'Integration Test', 'Explore']
 handoffs:
   - label: Commit Changes
     agent: agent

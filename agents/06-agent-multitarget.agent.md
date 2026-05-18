@@ -4,7 +4,7 @@ description: "Use when multitargeting a .NET project to add multiple target fram
 argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj and target frameworks to add (for example: net10.0)"
 target: vscode
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
-agents: ['Build Fix', 'Plan']
+agents: ['Build Fix', 'Plan', 'Integration Test']
 model: claude-sonnet-4.6
 handoffs:
   - label: Commit Changes

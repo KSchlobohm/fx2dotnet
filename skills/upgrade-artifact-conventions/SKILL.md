@@ -46,6 +46,7 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 |----------|---------|---------|
 | Agent file | `.github/agents/{id}-agent-{purpose}.agent.md` | `.github/agents/01-agent-assessment.agent.md` |
 | Sub-agent file | `.github/agents/subagent-{purpose}.agent.md` | `.github/agents/subagent-build-fix.agent.md` |
+| Integration test agent | `.github/agents/subagent-integration-test.agent.md` | (fixed name — shared exit gate) |
 | Plan file | `{stateRoot}/{id}-plan.md` | `.fx2dotnet/02-plan.md` |
 | Progress file (markdown) | `{stateRoot}/{id}-progress.md` | `.fx2dotnet/02-progress.md` |
 | Progress file (JSON, script-parsed) | `{stateRoot}/{id}-progress.json` | `.fx2dotnet/05-progress.json` |

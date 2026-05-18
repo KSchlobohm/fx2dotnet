@@ -5,7 +5,7 @@ tools: [agent, read, edit, search, todo, vscode/askQuestions]
 user-invocable: false
 model: claude-sonnet-4.6
 argument-hint: "Required: legacy web project path(host .csproj or host folder). Optional: solution path and target framework"
-agents: ["Legacy Web Route Inventory", "Build Fix"]
+agents: ["Legacy Web Route Inventory", "Build Fix", "Integration Test"]
 ---
 
 You are a migration orchestrator focused on replacing an ASP.NET (.NET Framework) web application with a new ASP.NET Core web application while preserving endpoint behavior.
