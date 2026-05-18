@@ -99,11 +99,13 @@ The agent should process slices in this order (from `07-agent-aspnet-web-migrati
 
 ## Rules
 
-1. **One slice at a time.** The agent sets the next `pending` slice to `in-progress`, processes it, then sets it to `done`, `blocked`, or `deferred`.
-2. **Build Fix after every slice.** The agent must delegate to `Build Fix` before recording `buildValidation: "pass"` and before proceeding to the next slice.
-3. **Blocked stops the loop.** If a slice is `blocked`, the agent must stop. The human reviews and either resolves the block or changes the status to `deferred` before rerunning.
-4. **Deferred is terminal.** A `deferred` slice is not retried in this phase.
-5. **Endpoint parity is mandatory.** The agent must record `buildValidation: "pass"` before setting `status: "done"`.
+1. **One slice per invocation.** The agent is invoked once per slice. It sets the next `pending` slice to `in-progress`, processes it, then sets it to `done`, `blocked`, or `deferred`, and **stops**. It never begins a second slice in the same run.
+2. **`in-progress` is the scope contract.** The `in-progress` status is set at the start of an invocation and serves as the agent's bounded goal for that run. If the agent restarts mid-slice, it finds the `in-progress` entry and resumes that slice. If multiple slices are `in-progress`, the agent must stop and ask the human to repair the file.
+3. **Build Fix after every slice.** The agent must delegate to `Build Fix` before recording `buildValidation: "pass"`.
+4. **Startup validation after infrastructure slices.** For bootstrap, middleware, auth, and serialization slices, the agent must also run the Integration Test (validationLevel: startup) and receive PASS before marking `done`.
+5. **Blocked stops the agent.** If a slice is `blocked`, the agent must stop. The human reviews and either resolves the block or changes the status to `deferred` before rerunning.
+6. **Deferred is terminal.** A `deferred` slice is not retried in this phase.
+7. **Validate JSON after every write.** After writing this file, the agent immediately reads it back and verifies it is valid JSON. If invalid, the agent fixes it before continuing or stopping.
 
 ## Example: Completed Progress File
 
