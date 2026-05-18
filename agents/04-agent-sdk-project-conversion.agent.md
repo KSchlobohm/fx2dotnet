@@ -5,7 +5,6 @@ argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj file to convert t
 target: vscode
 tools: [vscode/askQuestions, read, agent, microsoft.githubcopilot.appmodernization.mcp/convert_project_to_sdk_style, Swick.Mcp.Fx2dotnet/GetMinimalPackageSet, edit, search, todo]
 agents: ['Build Fix']
-model: claude-sonnet-4.6
 handoffs:
   - label: Commit Changes
     agent: agent

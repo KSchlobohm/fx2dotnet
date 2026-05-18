@@ -6,7 +6,6 @@ target: vscode
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
 agents: ['Build Fix']
 user-invocable: false
-model: claude-sonnet-4.6
 handoffs:
   - label: Commit Changes
     agent: agent

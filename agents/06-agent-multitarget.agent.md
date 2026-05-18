@@ -5,7 +5,6 @@ argument-hint: "Specify the .sln, .csproj, .vbproj, or .fsproj and target framew
 target: vscode
 tools: ['search', 'read', 'edit', 'todo', 'vscode/askQuestions', 'agent']
 agents: ['Build Fix', 'Plan']
-model: claude-sonnet-4.6
 handoffs:
   - label: Commit Changes
     agent: agent

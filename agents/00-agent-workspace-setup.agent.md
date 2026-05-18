@@ -1,7 +1,6 @@
 ---
 name: "00 Workspace Setup"
 description: "Workshop setup: configures MCP servers and downloads skills for .NET Framework to modern .NET migration. Run this once before assessment work."
-model: claude-sonnet-4.6
 tools: [read, edit, powershell]
 argument-hint: "workspace directory (e.g., C:\\path\\to\\assurance)"
 ---
