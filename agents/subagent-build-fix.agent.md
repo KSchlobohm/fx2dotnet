@@ -191,6 +191,13 @@ Common .NET build error codes and typical fixes:
 
 **CS0234 / CS0246 from orphaned `using` directives** — when multiple files report CS0234 or CS0246 for a namespace that is not present in any package reference or project reference (e.g., `System.Activities`, `WebGrease.Css.Extensions`, `Microsoft.Ajax.Utilities`), the `using` directive is likely an unused relic from a removed dependency. Fix: remove the `using` line. These are safe to batch — they count as one logical fix per namespace. Verify after removal that no other code in the file depends on the namespace.
 
+**Locked binary / file-in-use errors** — MSBuild errors containing `Unable to copy file`, `The process cannot access the file because it is being used by another process`, or `Access to the path ... is denied` indicate that output assemblies are locked by another process (commonly IIS Express, a running `dotnet run` instance, a background build tool, or a test runner). This is NOT a source code error — do not attempt code fixes. Instead:
+1. Identify the locking process: run `Get-Process | Where-Object { $_.Modules.FileName -like '*bin\Debug*' -or $_.Modules.FileName -like '*bin\Release*' }` or check for `iisexpress`, `dotnet`, `w3wp`, `testhost`, or `VBCSCompiler` processes.
+2. Terminate the locking process (stop IIS Express, kill the running app instance, or stop the background build).
+3. If `VBCSCompiler` (Roslyn compiler server) is holding locks, run `dotnet build-server shutdown` to release them.
+4. Retry the build. If locks persist after two attempts, report the issue to the user — do not loop indefinitely.
+5. NEVER work around locked binaries by switching to a Release configuration or running pre-existing binaries from a prior build. Always resolve the lock and rebuild from current source.
+
 For unknown or non-listed errors:
 1. Parse the exact compiler message, file, and line context.
 2. Propose the smallest plausible fix and apply it.
