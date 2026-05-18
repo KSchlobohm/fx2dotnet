@@ -55,6 +55,7 @@ Use the lowest-specificity ID that is unambiguous. Add a letter suffix only when
 | Assessment report | `{stateRoot}/analysis.md` | `.fx2dotnet/analysis.md` |
 | Package findings | `{stateRoot}/package-updates.md` | `.fx2dotnet/package-updates.md` |
 | Orchestrator state | `{stateRoot}/dotnet-upgrade-plan.md` | `.fx2dotnet/dotnet-upgrade-plan.md` |
+| Completion report | `{stateRoot}/08-completion-report.md` | `.fx2dotnet/08-completion-report.md` |
 | Constitution | `.github/fx2dotnet/UPGRADE-CONSTITUTION.md` | (fixed path) |
 
 > **Progress file format:** Use `.md` for phases 01–04, whose progress is tracked in prose and not consumed by automation. Use `.json` for phases 05 and above, where a PowerShell validation script reads the file to determine migration status. The schema for each JSON progress file is defined in a corresponding progress template in the `templates/` folder.
