@@ -1,7 +1,7 @@
 ---
 name: "Integration Test"
 description: "Runs the workspace integration test as an exit gate to confirm a migration phase produced correct runtime behavior. Starts the application, verifies it does not crash, and optionally executes a test script. Use after completing migration slices or phases to validate work before marking done."
-model: claude-sonnet-4.5
+model: claude-haiku-4.5
 target: vscode
 user-invocable: false
 tools: ['read', 'search', 'agent', 'powershell']

@@ -140,6 +140,14 @@ When queue completes (or process is stopped by user), report:
 - Any skipped or unresolved items
 - Files modified
 
+### Exit Gate
+
+Before reporting completion, invoke the **Integration Test** agent with:
+- **projectPath** — the web host or entry-point project that exercises the updated packages
+- **validationLevel** — `startup`
+
+If the Integration Test agent reports FAIL, do not mark the phase complete. Report the failure to the caller or user and stop for guidance.
+
 ### Completion Checkpoint
 
 If this agent was invoked as a subagent (by the orchestrator or another agent), skip this checkpoint — return results to the caller.

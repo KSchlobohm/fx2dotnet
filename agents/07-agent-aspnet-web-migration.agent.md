@@ -187,7 +187,24 @@ After each meaningful migration step:
 - Run relevant tests when available.
 - Record incomplete endpoints, temporary stubs, and known gaps.
 
-Before declaring completion, verify:
+### Exit Gate — Startup
+
+After structural slices (bootstrap, middleware, auth, serialization, each controller group, and any slice that changes host startup, routing, or DI), invoke the **Integration Test** agent with:
+- **projectPath** — the new ASP.NET Core host `.csproj`
+- **validationLevel** — `startup`
+
+A startup FAIL is a blocking failure. Do not mark the slice done or proceed to the next slice until the failure is resolved.
+
+### Exit Gate — Integration (Phase Close)
+
+Before declaring the phase complete, invoke the **Integration Test** agent with:
+- **projectPath** — the new ASP.NET Core host `.csproj`
+- **validationLevel** — `integration`
+- **testScript** — path to the workspace integration test script (e.g., `test-api.ps1`)
+
+Do not declare phase completion unless the integration test returns PASS.
+
+Before declaring completion, also verify:
 
 - Every in-scope legacy endpoint is implemented, intentionally retired, or explicitly deferred.
 - Authentication and authorization behavior has been reviewed.
